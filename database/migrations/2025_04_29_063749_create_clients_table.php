@@ -19,6 +19,12 @@ return new class extends Migration
             $table->softDeletes();
             
         });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('client_id')->constrained('clients');
+        });
+
+
     }
 
     /**

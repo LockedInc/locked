@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Crud\UserController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -16,9 +17,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('tasks');
     })->name('tasks');
 
-    Route::get('users', function () {
-        return Inertia::render('users');
-    })->name('users');
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::post('users', [UserController::class, 'store'])->name('users.store');
 });
 
 require __DIR__.'/settings.php';
