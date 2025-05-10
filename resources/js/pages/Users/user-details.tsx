@@ -1,3 +1,4 @@
+import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -49,6 +50,11 @@ export default function UserDetails({ user }: UserDetailsProps) {
                             <div className="flex flex-col gap-2">
                                 <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Email</span>
                                 <p className="text-lg">{user.email}</p>
+                            </div>
+                            <div className="pt-4">
+                                <Button asChild variant="outline" className="w-full sm:w-auto">
+                                    <Link href="/users">Back to User List</Link>
+                                </Button>
                             </div>
                         </div>
                     </CardContent>
