@@ -13,7 +13,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return Inertia::render('users', [
+        return Inertia::render('Users/user-list', [
             'users' => $users
         ]);        
     }
@@ -24,16 +24,32 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'client_id' => 'required|integer',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'client_id' => 1
+            'client_id' => $request->client_id,
         ]);
 
         return back();
     }
+    
+    public function update(Request $request, User $user)
+    {
+        $user->update($request->all());
+        return back();
+    }
+
+    public function show(User $user)
+    {
+        return Inertia::render('Users/user-details', [
+            'user' => $user
+        ]);
+    }
+    
+    
 }
 

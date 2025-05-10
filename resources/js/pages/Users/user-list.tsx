@@ -1,24 +1,27 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+
 import { Plus, ArrowUpDown } from 'lucide-react';
 import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { PageProps } from '@/types';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import CreateUserDialog from '@/components/ui/create-user-dialog';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
+
     {
         title: 'Users',
         href: '/users',
     },
 ];
+
+
 
 interface User {
     id: number;
@@ -102,6 +105,7 @@ export default function Users({ users }: PageProps<{ users: User[] }>) {
                                             data={users}
                                             searchPlaceholder="Search users..."
                                             searchColumn="name"
+                                            onRowClick={(user) => router.visit(`/users/${user.id}`)}
                                         />
                                     </CardContent>
                                 </Card>

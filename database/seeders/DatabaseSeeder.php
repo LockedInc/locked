@@ -17,14 +17,22 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $client = Client::create([
-            'name' => 'Test Client',
+            'name' => 'Starplot',
         ]);
 
         User::create([
-            'name' => 'Test User',
+            'name' => 'Ryan Mueller',
             'password' => Hash::make('password'),
-            'email' => 'test@example.com',
+            'email' => 'ryan@starplot.ai',
             'client_id' => $client->id,
         ]);
+
+        User::create([
+            'name' => 'Andrew McDowell',
+            'password' => Hash::make('password'),
+            'email' => 'andrew@starplot.ai',
+            'client_id' => $client->id,
+        ]);
+        
     }
 }

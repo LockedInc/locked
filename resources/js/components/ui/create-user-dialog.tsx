@@ -1,6 +1,7 @@
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 import { Plus, LoaderCircle } from 'lucide-react';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -8,18 +9,33 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
 
+interface PageProps extends InertiaPageProps {
+    auth: {
+        user: {
+            client_id: number;
+        };
+    };
+}
+
 export default function CreateUserDialog() {
+    const { auth } = usePage<PageProps>().props;
+    const clientId = auth.user.client_id;
+
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
+        client_id: clientId,
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('users.store'), {
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                window.location.href = route('users.index');
+            },
         });
     };
 
