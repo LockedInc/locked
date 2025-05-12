@@ -28,7 +28,6 @@ interface User {
     name: string;
     email: string;
 }
-
 const columns: ColumnDef<User>[] = [
     {
         id: "select",

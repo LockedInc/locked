@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface PageProps extends InertiaPageProps {
     auth: {
@@ -15,10 +16,14 @@ interface PageProps extends InertiaPageProps {
             client_id: number;
         };
     };
+    roles: Array<{
+        id: number;
+        name: string;
+    }>;
 }
 
 export default function CreateUserDialog() {
-    const { auth } = usePage<PageProps>().props;
+    const { auth, roles } = usePage<PageProps>().props;
     const clientId = auth.user.client_id;
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -27,6 +32,7 @@ export default function CreateUserDialog() {
         password: '',
         password_confirmation: '',
         client_id: clientId,
+        role_id: roles.find(r => r.name === 'member')?.id || '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -101,6 +107,26 @@ export default function CreateUserDialog() {
                                 placeholder="Confirm password"
                             />
                             <InputError message={errors.password_confirmation} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="role_id">Role</Label>
+                            <Select
+                                value={data.role_id.toString()}
+                                onValueChange={(value) => setData('role_id', parseInt(value))}
+                            >
+                                <SelectTrigger id="role_id">
+                                    <SelectValue placeholder="Select a role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {roles.map((role) => (
+                                        <SelectItem key={role.id} value={role.id.toString()}>
+                                            {role.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <InputError message={errors.role_id} />
                         </div>
                     </div>
 

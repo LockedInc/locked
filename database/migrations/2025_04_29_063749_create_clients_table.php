@@ -21,7 +21,7 @@ return new class extends Migration
         });
 
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('client_id')->constrained('clients');
+            $table->foreignId('client_id')->after('id')->nullable()->constrained('clients');
         });
 
 
