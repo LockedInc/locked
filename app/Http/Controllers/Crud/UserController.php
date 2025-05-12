@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -39,11 +41,19 @@ class UserController extends Controller
     
     public function update(Request $request, User $user)
     {   
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
         ]);
-        $user->update($request->validated());
+
+
+        $user->update($validated);
         return back();
     }
 
@@ -52,6 +62,12 @@ class UserController extends Controller
         return Inertia::render('Users/user-details', [
             'user' => $user
         ]);
+    }
+
+    public function destroy(User $user)
+    {
+        $user->delete();
+        return redirect()->route('users.index');
     }
     
     
