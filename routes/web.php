@@ -15,17 +15,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::get('tasks', function () {
-        return Inertia::render('tasks');
+        return Inertia::render('admin/admin-task-list');
     })->name('tasks');
 
-
-
+    // Admin Routes
     Route::middleware(['role:Client-Admin'])->group(function () {
-        Route::get('users', [ClientAdminUserController::class, 'index'])->name('users.index');
-        Route::post('users', [ClientAdminUserController::class, 'store'])->name('users.store');
-        Route::get('users/{user}', [ClientAdminUserController::class, 'show'])->name('users.show');
-        Route::put('users/{user}', [ClientAdminUserController::class, 'update'])->name('users.update');
-        Route::delete('users/{user}', [ClientAdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::get('users', [ClientAdminUserController::class, 'index'])->name('admin.users.index');
+        Route::post('users', [ClientAdminUserController::class, 'store'])->name('admin.users.store');
+        Route::get('users/{user}', [ClientAdminUserController::class, 'show'])->name('admin.users.show');
+        Route::put('users/{user}', [ClientAdminUserController::class, 'update'])->name('admin.users.update');
+        Route::delete('users/{user}', [ClientAdminUserController::class, 'destroy'])->name('admin.users.destroy');
     });
 });
 
