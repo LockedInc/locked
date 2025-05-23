@@ -12,7 +12,7 @@ class ClientSeeder extends Seeder
     public function run()
     {
         Client::create([
-            'name' => 'Starplot',
+            'name' => 'Equippers',
         ]);
     }
 }

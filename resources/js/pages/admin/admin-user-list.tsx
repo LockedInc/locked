@@ -86,30 +86,29 @@ export default function Users({ users }: PageProps<{ users: User[] }>) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border md:min-h-min">
-                    <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <Card>
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <div>
-                                            <CardTitle>User List</CardTitle>
-                                            <CardDescription>Manage your users and their permissions</CardDescription>
-                                        </div>
-                                        <CreateUserDialog />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <DataTable
-                                            columns={columns}
-                                            data={users}
-                                            searchPlaceholder="Search users..."
-                                            searchColumn="name"
-                                            onRowClick={(user) => router.visit(`/users/${user.id}`)}
-                                        />
-                                    </CardContent>
-                                </Card>
-                            </div>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <h1 className="text-2xl font-semibold ml-5">Manage Your Users</h1>
+                <div className="flex h-full flex-1 flex-col gap-5">
+                    <div className="flex gap-4">
+                        <div className="flex-1">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <div>
+                                        {/* <CardTitle>User List</CardTitle> */}
+                                        {/* <CardDescription>Manage your users and their permissions</CardDescription> */}
+                                    </div>
+                                    <CreateUserDialog />
+                                </CardHeader>
+                                <CardContent>
+                                    <DataTable
+                                        columns={columns}
+                                        data={users}
+                                        searchPlaceholder="Search users..."
+                                        searchColumn="name"
+                                        onRowClick={(user) => router.visit(`/users/${user.id}`)}
+                                    />
+                                </CardContent>
+                            </Card>
                         </div>
                     </div>
                 </div>

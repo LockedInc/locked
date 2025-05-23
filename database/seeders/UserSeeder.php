@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             # client admin
             'name' => 'Ryan Mueller',
             'password' => Hash::make('password'),
-            'email' => 'ryan@starplot.ai',
+            'email' => 'ryan@equippers.com',
             'password_set' => true,
             'email_verified_at' => now(),
             'client_id' => 1,
@@ -29,7 +29,40 @@ class UserSeeder extends Seeder
             # client member
             'name' => 'Andrew McDowell',
             'password' => Hash::make('password'),
-            'email' => 'andrew@starplot.ai',
+            'email' => 'andrew@equippers.com',
+            'password_set' => true,
+            'email_verified_at' => now(),
+            'client_id' => 1,
+            'role_id' => 3,
+        ]);
+
+        User::create([
+            # client member
+            'name' => 'Allison Port',
+            'password' => Hash::make('password'),
+            'email' => 'allison@equippers.com',
+            'password_set' => true,
+            'email_verified_at' => now(),
+            'client_id' => 1,
+            'role_id' => 3,
+        ]);
+
+        User::create([
+            # client member
+            'name' => 'George Kalafatis',
+            'password' => Hash::make('password'),
+            'email' => 'george@equippers.com',
+            'password_set' => true,
+            'email_verified_at' => now(),
+            'client_id' => 1,
+            'role_id' => 3,
+        ]);
+
+        User::create([
+            # client member
+            'name' => 'John Doe',
+            'password' => Hash::make('password'),
+            'email' => 'john@equippers.com',
             'password_set' => true,
             'email_verified_at' => now(),
             'client_id' => 1,

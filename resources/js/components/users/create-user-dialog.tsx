@@ -1,7 +1,7 @@
 import { useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 import { Plus, LoaderCircle } from 'lucide-react';
-import type { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { PageProps } from '@/types';
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import InputError from '@/components/input-error';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 
-interface PageProps extends InertiaPageProps {
+type DialogProps = {
     auth: {
         user: {
             client_id: number;
@@ -24,7 +24,7 @@ interface PageProps extends InertiaPageProps {
 }
 
 export default function CreateUserDialog() {
-    const { auth, roles } = usePage<PageProps>().props;
+    const { auth, roles } = usePage<PageProps<DialogProps>>().props;
     const clientId = auth.user.client_id;
 
     const { data, setData, post, processing, errors, reset } = useForm({
