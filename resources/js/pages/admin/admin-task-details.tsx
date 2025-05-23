@@ -9,17 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Task, TaskStatus, TaskPriority, User } from '@/types/task';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { useForm } from '@inertiajs/react';
-import { Check, ChevronsUpDown, Trash2 } from "lucide-react"
+import { Check, ChevronsUpDown, Trash2, Calendar, Users, AlertCircle } from "lucide-react"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-
-
-
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Task Details',
-        href: '/tasks/details',
+        href: '#',
     },
 ];
 
@@ -38,15 +35,15 @@ interface PageProps {
 }
 
 const statusColors = {
-    'pending': 'bg-yellow-100 text-yellow-800',
-    'in_progress': 'bg-blue-100 text-blue-800',
-    'completed': 'bg-green-100 text-green-800'
+    'pending': 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+    'in_progress': 'bg-blue-50 text-blue-700 border border-blue-200',
+    'completed': 'bg-green-50 text-green-700 border border-green-200'
 };
 
 const priorityColors = {
-    'low': 'bg-gray-100 text-gray-800',
-    'medium': 'bg-orange-100 text-orange-800',
-    'high': 'bg-red-100 text-red-800'
+    'low': 'bg-gray-50 text-gray-700 border border-gray-200',
+    'medium': 'bg-orange-50 text-orange-700 border border-orange-200',
+    'high': 'bg-red-50 text-red-700 border border-red-200'
 };
 
 export default function TaskDetails({ task, all_users }: PageProps) {
@@ -126,9 +123,10 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                         value={data.name}
                                         onChange={e => setData('name', e.target.value)}
                                         error={errors.name}
+                                        className="h-10"
                                     />
                                 ) : (
-                                    <div className="text-lg font-medium">{task.name}</div>
+                                    <div className="text-lg font-medium mt-2 h-10 flex items-center">{task.name}</div>
                                 )}
                             </div>
 
@@ -140,13 +138,16 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                         value={data.description}
                                         onChange={e => setData('description', e.target.value)}
                                         error={errors.description}
+                                        className="min-h-[100px]"
                                     />
                                 ) : (
-                                    <div className="text-muted-foreground">{task.description}</div>
+                                    <div className="text-muted-foreground bg-muted/50 p-3 rounded-md mt-2 min-h-[100px]">
+                                        {task.description}
+                                    </div>
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="status">Status</Label>
                                     {isEditing ? (
@@ -156,7 +157,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                                 setData('status', value as TaskStatus);
                                             }}
                                         >
-                                            <SelectTrigger>
+                                            <SelectTrigger className="h-10">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -166,9 +167,11 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                             </SelectContent>
                                         </Select>
                                     ) : (
-                                        <Badge className={statusColors[task.status]}>
-                                            {task.status.replace('_', ' ')}
-                                        </Badge>
+                                        <div className="mt-2 h-10 flex items-center">
+                                            <Badge className={cn(statusColors[task.status], "text-sm font-medium px-3 py-1")}>
+                                                {task.status.replace('_', ' ')}
+                                            </Badge>
+                                        </div>
                                     )}
                                 </div>
 
@@ -181,7 +184,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                                 setData('priority', value as TaskPriority);
                                             }}
                                         >
-                                            <SelectTrigger>
+                                            <SelectTrigger className="h-10">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -191,86 +194,95 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                             </SelectContent>
                                         </Select>
                                     ) : (
-                                        <Badge className={priorityColors[task.priority]}>
-                                            {task.priority}
-                                        </Badge>
+                                        <div className="mt-2 h-10 flex items-center">
+                                            <Badge className={cn(priorityColors[task.priority], "text-sm font-medium px-3 py-1")}>
+                                                {task.priority}
+                                            </Badge>
+                                        </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Due Date</Label>
-                                {isEditing ? (
-                                    <Input
-                                        type="date"
-                                        value={data.due_date ? new Date(data.due_date).toISOString().split('T')[0] : ''}
-                                        onChange={e => setData('due_date', e.target.value)}
-                                        error={errors.due_date}
-                                    />
-                                ) : (
-                                    <div>
-                                        {task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No due date'}
-                                    </div>
-                                )}
-                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label>Due Date</Label>
+                                    {isEditing ? (
+                                        <Input
+                                            type="date"
+                                            value={data.due_date ? new Date(data.due_date).toISOString().split('T')[0] : ''}
+                                            onChange={e => setData('due_date', e.target.value)}
+                                            error={errors.due_date}
+                                            className="h-10"
+                                        />
+                                    ) : (
+                                        <div className="flex items-center text-muted-foreground mt-2 h-10">
+                                            <Calendar className="h-4 w-4 mr-2" />
+                                            {task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No due date'}
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div className="space-y-2">
-                                <Label>Assigned Users</Label>
-                                {isEditing ? (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                role="combobox"
-                                                className="w-full justify-between"
-                                            >
-                                                {data.users.length > 0
-                                                    ? `${data.users.length} users selected`
-                                                    : "Select users..."}
-                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-full p-0">
-                                            <Command>
-                                                <CommandInput placeholder="Search users..." />
-                                                <CommandEmpty>No users found.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {all_users.map((user) => (
-                                                        <CommandItem
-                                                            key={user.id}
-                                                            onSelect={() => {
-                                                                const currentUsers = [...data.users];
-                                                                const index = currentUsers.indexOf(user.id);
-                                                                if (index === -1) {
-                                                                    currentUsers.push(user.id);
-                                                                } else {
-                                                                    currentUsers.splice(index, 1);
-                                                                }
-                                                                setData('users', currentUsers);
-                                                            }}
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    data.users.includes(user.id) ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            {user.name}
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                ) : (
-                                    <div className="flex flex-wrap gap-1">
-                                        {task.users.map((user) => (
-                                            <Badge key={user.id} variant="secondary">
-                                                {user.name}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                )}
+                                <div className="space-y-2">
+                                    <Label>Assigned Users</Label>
+                                    {isEditing ? (
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    className="w-full justify-between h-10"
+                                                >
+                                                    {data.users.length > 0
+                                                        ? `${data.users.length} users selected`
+                                                        : "Select users..."}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-full p-0" align="start">
+                                                <Command className="max-h-[200px]">
+                                                    <CommandInput placeholder="Search users..." />
+                                                    <CommandEmpty>No users found.</CommandEmpty>
+                                                    <CommandGroup className="overflow-y-auto">
+                                                        {all_users.map((user) => (
+                                                            <CommandItem
+                                                                key={user.id}
+                                                                onSelect={() => {
+                                                                    const newUsers = data.users.includes(user.id)
+                                                                        ? data.users.filter(id => id !== user.id)
+                                                                        : [...data.users, user.id];
+                                                                    setData('users', newUsers);
+                                                                }}
+                                                                className="flex items-center gap-2 px-2 py-1.5"
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        "h-4 w-4",
+                                                                        data.users.includes(user.id) ? "opacity-100" : "opacity-0"
+                                                                    )}
+                                                                />
+                                                                <span>{user.name}</span>
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
+                                    ) : (
+                                        <div className="space-y-2 mt-2 min-h-[40px]">
+                                            <div className="flex items-center text-muted-foreground">
+                                                <Users className="h-4 w-4 mr-2" />
+                                                {task.users.length} {task.users.length === 1 ? 'User' : 'Users'} Assigned
+                                            </div>
+                                            <div className="flex flex-wrap gap-1">
+                                                {task.users.map((user) => (
+                                                    <Badge key={user.id} variant="secondary" className="text-sm">
+                                                        {user.name}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </form>
                     </CardContent>
