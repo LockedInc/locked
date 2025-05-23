@@ -1,15 +1,16 @@
 import { useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
-import { Plus, LoaderCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import { PageProps } from '@/types';
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
+import { SingleSelect } from '@/components/ui/single-select';
 
 type DialogProps = {
     auth: {
@@ -23,7 +24,12 @@ type DialogProps = {
     }>;
 }
 
-export default function CreateUserDialog() {
+interface CreateUserDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+export default function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) {
     const { auth, roles } = usePage<PageProps<DialogProps>>().props;
     const clientId = auth.user.client_id;
 
@@ -41,7 +47,7 @@ export default function CreateUserDialog() {
         post(route('admin.users.store'), {
             onSuccess: () => {
                 reset();
-                window.location.href = route('admin.users.index');
+                onOpenChange(false);
             },
         });
     };
@@ -51,13 +57,7 @@ export default function CreateUserDialog() {
     };
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New User
-                </Button>
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Create New User</DialogTitle>
@@ -121,30 +121,24 @@ export default function CreateUserDialog() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="role_id">Role</Label>
-                                    <Select
-                                        value={data.role_id.toString()}
-                                        onValueChange={(value) => setData('role_id', parseInt(value))}
-                                    >
-                                        <SelectTrigger id="role_id" className="w-full">
-                                            <SelectValue placeholder="Select a role" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {roles.map((role) => (
-                                                <SelectItem key={role.id} value={role.id.toString()}>
-                                                    {formatRoleName(role.name)}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.role_id} />
+                                    <SingleSelect
+                                        items={roles.map(r => ({ id: r.id, name: formatRoleName(r.name) }))}
+                                        selectedId={data.role_id ? Number(data.role_id) : null}
+                                        onChange={id => setData('role_id', id)}
+                                        placeholder="Select a role"
+                                        label="Role"
+                                        error={errors.role_id}
+                                    />
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     <DialogFooter className="mt-4">
-                        <Button type="submit" disabled={processing} className="w-full sm:w-auto">
+                        <Button variant="outline" onClick={() => onOpenChange(false)} className="cursor-pointer">
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled={processing} className="w-full sm:w-auto cursor-pointer">
                             {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                             Create User
                         </Button>

@@ -11,12 +11,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useState, useEffect, useCallback } from "react"
 import { useForm } from "@inertiajs/react"
 import { TaskStatus, TaskPriority, User } from "@/types/task"
-import { Badge } from "@/components/ui/badge"
+import { MultiSelect } from "@/components/ui/multi-select"
 
 interface CreateTaskDialogProps {
     users: User[];
@@ -25,9 +22,6 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ users, open, onOpenChange }: CreateTaskDialogProps) {
-    const [userPopoverOpen, setUserPopoverOpen] = useState(false);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
-    
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         description: '',
@@ -37,31 +31,6 @@ export function CreateTaskDialog({ users, open, onOpenChange }: CreateTaskDialog
         users: [] as number[]
     });
 
-    // Update filtered users when users prop changes
-    useEffect(() => {
-        setFilteredUsers(users);
-    }, [users]);
-
-    const handleUserSearch = useCallback((searchTerm: string) => {
-        const filtered = users.filter(user => 
-            user.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredUsers(filtered);
-    }, [users]);
-
-    const handleUserSelect = useCallback((userId: number) => {
-        const currentUsers = [...data.users];
-        const index = currentUsers.indexOf(userId);
-        
-        if (index === -1) {
-            currentUsers.push(userId);
-        } else {
-            currentUsers.splice(index, 1);
-        }
-        
-        setData('users', currentUsers);
-    }, [data.users, setData]);
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/tasks', {
@@ -70,16 +39,6 @@ export function CreateTaskDialog({ users, open, onOpenChange }: CreateTaskDialog
                 onOpenChange(false);
             }
         });
-    };
-
-    const handleDropdownToggle = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setUserPopoverOpen(prev => !prev);
-    };
-
-    const handleDropdownClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
     };
 
     return (
@@ -115,40 +74,38 @@ export function CreateTaskDialog({ users, open, onOpenChange }: CreateTaskDialog
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="status">Status</Label>
-                                    <Select
-                                        value={data.status}
-                                        onValueChange={(value) => setData('status', value as TaskStatus)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="pending">Pending</SelectItem>
-                                            <SelectItem value="in_progress">In Progress</SelectItem>
-                                            <SelectItem value="completed">Completed</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="status">Status</Label>
+                                <Select
+                                    value={data.status}
+                                    onValueChange={(value) => setData('status', value as TaskStatus)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="pending">Pending</SelectItem>
+                                        <SelectItem value="in_progress">In Progress</SelectItem>
+                                        <SelectItem value="completed">Completed</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="priority">Priority</Label>
-                                    <Select
-                                        value={data.priority}
-                                        onValueChange={(value) => setData('priority', value as TaskPriority)}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="low">Low</SelectItem>
-                                            <SelectItem value="medium">Medium</SelectItem>
-                                            <SelectItem value="high">High</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="priority">Priority</Label>
+                                <Select
+                                    value={data.priority}
+                                    onValueChange={(value) => setData('priority', value as TaskPriority)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="low">Low</SelectItem>
+                                        <SelectItem value="medium">Medium</SelectItem>
+                                        <SelectItem value="high">High</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="space-y-2">
@@ -164,84 +121,22 @@ export function CreateTaskDialog({ users, open, onOpenChange }: CreateTaskDialog
                         </div>
 
                         <div className="space-y-6">
-                            <div className="space-y-2">
-                                <Label>Assign Users</Label>
-                                <div className="relative">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        role="combobox"
-                                        className="w-full justify-between"
-                                        onClick={handleDropdownToggle}
-                                    >
-                                        {data.users.length > 0
-                                            ? `${data.users.length} users selected`
-                                            : "Select users..."}
-                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                    {userPopoverOpen && (
-                                        <div 
-                                            className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg"
-                                            onClick={handleDropdownClick}
-                                        >
-                                            <div className="p-2 border-b">
-                                                <Input 
-                                                    type="text"
-                                                    placeholder="Search users..." 
-                                                    className="border-0 focus-visible:ring-0"
-                                                    onClick={handleDropdownClick}
-                                                    onChange={(e) => handleUserSearch(e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="max-h-[300px] overflow-auto">
-                                                {(filteredUsers.length > 0 ? filteredUsers : users).map((user) => (
-                                                    <div
-                                                        key={user.id}
-                                                        className="flex items-center px-4 py-2 hover:bg-accent cursor-pointer"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            handleUserSelect(user.id);
-                                                        }}
-                                                    >
-                                                        <Check
-                                                            className={cn(
-                                                                "mr-2 h-4 w-4",
-                                                                data.users.includes(user.id) ? "opacity-100" : "opacity-0"
-                                                            )}
-                                                        />
-                                                        {user.name}
-                                                    </div>
-                                                ))}
-                                                {filteredUsers.length === 0 && (
-                                                    <div className="px-4 py-2 text-sm text-muted-foreground">
-                                                        No users found.
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                {data.users.length > 0 && (
-                                    <div className="flex flex-wrap gap-1">
-                                        {users
-                                            .filter(user => data.users.includes(user.id))
-                                            .map(user => (
-                                                <Badge key={user.id} variant="secondary">
-                                                    {user.name}
-                                                </Badge>
-                                            ))}
-                                    </div>
-                                )}
-                                {errors.users && (
-                                    <p className="text-sm text-red-500">{errors.users}</p>
-                                )}
-                            </div>
+                            <MultiSelect
+                                items={users}
+                                selectedIds={data.users}
+                                onSelectionChange={(ids) => setData('users', ids)}
+                                placeholder="Select users..."
+                                label="Assign Users"
+                                error={errors.users}
+                            />
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button type="submit" disabled={processing}>
+                        <Button variant="outline" onClick={() => onOpenChange(false)} className="cursor-pointer">
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled={processing} className="cursor-pointer">
                             Create Task
                         </Button>
                     </DialogFooter>

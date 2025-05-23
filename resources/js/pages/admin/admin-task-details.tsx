@@ -17,6 +17,7 @@ import { Check, ChevronsUpDown, Trash2, Calendar, Users, AlertCircle } from "luc
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -70,11 +71,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
         setIsEditing(false);
     };
 
-    const handleDelete = () => {
-        if (confirm("Are you sure you want to delete this task?")) {
-            router.delete(`/tasks/${task.id}`);
-        }
-    };
+
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -85,25 +82,27 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                     <div className="flex gap-2">
                         {isEditing ? (
                             <>
-                                <Button variant="outline" onClick={handleCancel}>
+                                <Button variant="outline" onClick={handleCancel} className="cursor-pointer">
                                     Cancel
                                 </Button>
-                                <Button onClick={handleSubmit} disabled={processing}>
+                                <Button onClick={handleSubmit} disabled={processing} className="cursor-pointer">
                                     Save Changes
                                 </Button>
                             </>
                         ) : (
                             <>
-                                <Button onClick={() => setIsEditing(true)}>
+                                <Button onClick={() => setIsEditing(true)} className="cursor-pointer">
                                     Edit Task
                                 </Button>
-                                <Button
-                                    variant="destructive"
-                                    onClick={handleDelete}
+                                <DeleteConfirmation
+                                    onConfirm={() => router.delete(`/tasks/${task.id}`)}
+                                    itemType="task"
+                                    itemName={task.name}
                                 >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete Task
-                                </Button>
+                                    <Button variant="destructive" className="cursor-pointer">
+                                        Delete Task
+                                    </Button>
+                                </DeleteConfirmation>
                             </>
                         )}
                     </div>
@@ -271,14 +270,20 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                         <div className="space-y-2 mt-2 min-h-[40px]">
                                             <div className="flex items-center text-muted-foreground">
                                                 <Users className="h-4 w-4 mr-2" />
-                                                {task.users.length} {task.users.length === 1 ? 'User' : 'Users'} Assigned
+                                                {task.users.length > 0 
+                                                    ? `${task.users.length} ${task.users.length === 1 ? 'User' : 'Users'} Assigned`
+                                                    : 'No Users Assigned'}
                                             </div>
                                             <div className="flex flex-wrap gap-1">
-                                                {task.users.map((user) => (
-                                                    <Badge key={user.id} variant="secondary" className="text-sm">
-                                                        {user.name}
-                                                    </Badge>
-                                                ))}
+                                                {task.users.length > 0 ? (
+                                                    task.users.map((user) => (
+                                                        <Badge key={user.id} variant="secondary" className="text-sm">
+                                                            {user.name}
+                                                        </Badge>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-muted-foreground text-sm">None</span>
+                                                )}
                                             </div>
                                         </div>
                                     )}
@@ -287,6 +292,11 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                         </form>
                     </CardContent>
                 </Card>
+                <div className="mt-6">
+                    <Button variant="outline" onClick={() => router.visit('/tasks')} className="cursor-pointer">
+                        ← Back to Tasks List
+                    </Button>
+                </div>
             </div>
         </AppLayout>
     );

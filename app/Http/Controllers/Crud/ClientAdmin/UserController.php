@@ -45,7 +45,7 @@ class UserController extends Controller
             'client_id' => $request->client_id,
             'role_id' => $request->role_id,
         ]);
-
+        session()->flash('success', 'User created successfully!');
         return back();
     }
     
@@ -68,6 +68,7 @@ class UserController extends Controller
 
 
         $user->update($validated);
+        session()->flash('success', 'User updated successfully!');
         return back();
     }
 
@@ -85,6 +86,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
+        session()->flash('success', 'User deleted successfully!');
         return redirect()->route('admin.users.index');
     }
     

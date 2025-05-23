@@ -55,7 +55,7 @@ class TaskController extends Controller
         if ($request->has('users')) {
             $task->users()->attach($request->users);
         }
-
+        session()->flash('success', 'Task created successfully!');
         return back();
     }   
 
@@ -105,6 +105,7 @@ class TaskController extends Controller
             $task->users()->sync($request->users);
         }
 
+        session()->flash('success', 'Task updated successfully!');
         return back();
     }
 
@@ -116,6 +117,7 @@ class TaskController extends Controller
         }
 
         $task->delete();
+        session()->flash('success', 'Task deleted successfully!');
         return redirect()->route('admin.tasks.index');
     }
     

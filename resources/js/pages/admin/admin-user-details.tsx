@@ -8,6 +8,8 @@ import { User, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageProps } from '@/types';
+import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
+
 
 interface User {
     id: number;
@@ -46,12 +48,7 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
         setIsEditing(false);
     };
 
-    const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this user?')) {
-            router.delete(`/users/${user.id}`, {
-            });
-        }
-    };
+
 
 
     return (
@@ -75,12 +72,14 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
                                             variant="outline"
                                             onClick={handleCancel}
                                             disabled={processing}
+                                            className="cursor-pointer"
                                         >
                                             Cancel
                                         </Button>
                                         <Button
                                             onClick={handleSave}
                                             disabled={processing}
+                                            className="cursor-pointer"
                                         >
                                             {processing ? 'Saving...' : 'Save Changes'}
                                         </Button>
@@ -90,16 +89,19 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
                                         <Button
                                             variant="outline"
                                             onClick={() => setIsEditing(true)}
+                                            className="cursor-pointer"
                                         >
                                             Edit Profile
                                         </Button>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={handleDelete}
+                                        <DeleteConfirmation
+                                            onConfirm={() => router.delete(`/users/${user.id}`)}
+                                            itemType="user"
+                                            itemName={user.name}
                                         >
-                                            <Trash2 className="h-4 w-4 mr-2" />
-                                            Delete User
-                                        </Button>
+                                            <Button variant="destructive" className="cursor-pointer">
+                                                Delete User
+                                            </Button>
+                                        </DeleteConfirmation>
                                     </div>
                                 )}
                             </div>

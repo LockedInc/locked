@@ -12,8 +12,6 @@ class TaskSeeder extends Seeder
 {
     public function run(): void
     {
-        // Get client 1
-        $client = Client::find(1);
 
         // Get some users to assign to tasks
         $users = User::where('client_id', 1)->take(3)->get();
