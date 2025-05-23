@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,6 @@ import { Plus, ArrowUpDown } from 'lucide-react';
 import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Task, TaskStatus, User } from '@/types/task';
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
@@ -20,7 +19,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/tasks',
     },
 ];
-
 
 interface PageProps {
     tasks: Task[];
@@ -135,6 +133,13 @@ const columns: ColumnDef<Task>[] = [
 
 export default function Tasks({ tasks, users }: PageProps) {
     const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+    const { url } = usePage();
+    const params = new URLSearchParams(url.split('?')[1]);
+    const statusFilter = params.get('status');
+
+    const filteredTasks = statusFilter
+        ? tasks.filter((task) => task.status === statusFilter)
+        : tasks;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -147,11 +152,26 @@ export default function Tasks({ tasks, users }: PageProps) {
                     </div>
                 </div>
 
+                {statusFilter && (
+                    <div className="mb-4 flex items-center gap-2 px-6">
+                        <span className="text-sm text-muted-foreground">Showing tasks with status:</span>
+                        <Badge variant="outline" className="font-medium">{statusFilter.replace('_', ' ')}</Badge>
+                        <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            onClick={() => router.visit('/tasks')} 
+                            className="h-7 px-2 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                            Clear filter
+                        </Button>
+                    </div>
+                )}
+
                 <Card>
                     <CardContent className="pt-6 ">
                         <DataTable
                             columns={columns}
-                            data={tasks}
+                            data={filteredTasks}
                             searchPlaceholder="Search tasks..."
                             searchColumn="name"
                             onRowClick={(task) => router.visit(`/tasks/${task.id}`)}

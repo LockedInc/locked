@@ -6,15 +6,15 @@ use App\Http\Controllers\Crud\ClientAdmin\UserController as ClientAdminUserContr
 use App\Http\Controllers\Crud\ClientAdmin\TaskController as ClientAdminTaskController;
 use App\Http\Controllers\Crud\ClientAdmin\MeetingController as ClientAdminMeetingController;
 use App\Http\Middleware\CheckRole;
+use App\Http\Controllers\ClientAdmin\AdminDashboardController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+        ->name('dashboard');
 
     // Admin Task Routes
     Route::middleware(['role:Client-Admin'])->group(function () {

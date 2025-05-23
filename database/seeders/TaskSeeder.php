@@ -58,6 +58,47 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->addDays(10),
                 'client_id' => 1,
             ],
+            [
+                'name' => 'Implement the new test',
+                'description' => 'Build the new test',
+                'status' => 'in_progress',
+                'priority' => 'high',
+                'due_date' => now()->addDays(5),
+                'client_id' => 1,
+            ],
+            [
+                'name' => 'Implement New Object Detection Model',
+                'description' => 'Build object detection model with YOLOv5',
+                'status' => 'in_progress',
+                'priority' => 'high',
+                'due_date' => now()->addDays(5),
+                'client_id' => 1,
+            ], 
+            [
+                'name' => 'Start New Project',
+                'description' => 'Start new project with Laravel and React',
+                'status' => 'in_progress',
+                'priority' => 'high',
+                'due_date' => now()->addDays(5),
+                'client_id' => 1,
+            ], 
+            [
+                'name' => 'Diagnose and Fix Issue',
+                'description' => 'Diagnose and fix issue with Laravel and React',
+                'status' => 'in_progress',
+                'priority' => 'high',
+                'due_date' => now()->addDays(5),
+                'client_id' => 1,
+            ],
+
+            [
+                'name' => 'Transfer Data to New Database',
+                'description' => 'Transfer data to new database',
+                'status' => 'in_progress',
+                'priority' => 'high',
+                'due_date' => now()->addDays(5),
+                'client_id' => 1,
+            ],
         ];
 
         foreach ($tasks as $taskData) {
