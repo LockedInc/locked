@@ -4,7 +4,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowUpDown } from 'lucide-react';
 import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
@@ -21,7 +21,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type TaskPriority = 'low' | 'medium' | 'high';
 
 interface PageProps {
     tasks: Task[];
@@ -31,7 +30,18 @@ interface PageProps {
 const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "name",
-        header: "Task",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    className="cursor-pointer"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Task
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
         cell: ({ row }) => {
             const task = row.original
             return (
@@ -44,7 +54,18 @@ const columns: ColumnDef<Task>[] = [
     },
     {
         accessorKey: "status",
-        header: "Status",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    className="cursor-pointer"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Status
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
         cell: ({ row }) => {
             const status = row.getValue("status") as TaskStatus
             const statusColors = {
@@ -61,7 +82,18 @@ const columns: ColumnDef<Task>[] = [
     },
     {
         accessorKey: "due_date",
-        header: "Due Date",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    className="cursor-pointer"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Due Date
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
         cell: ({ row }) => {
             const date = row.original.due_date
             if (!date) return '-'
@@ -74,7 +106,18 @@ const columns: ColumnDef<Task>[] = [
     },
     {
         accessorKey: "users",
-        header: "Assigned To",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    className="cursor-pointer"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Assigned To
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
         cell: ({ row }) => {
             const assignedUsers = row.original.users || []
             return (
