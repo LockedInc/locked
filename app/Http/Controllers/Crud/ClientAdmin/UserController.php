@@ -15,8 +15,10 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::where('client_id', auth()->user()->client_id)->get();
-        return Inertia::render('Users/user-list', [
+        $users = User::where('client_id', auth()->user()->client_id)
+            ->with('role:id,name')
+            ->get();
+        return Inertia::render('admin/admin-user-list', [
             'users' => $users,
             'roles' => Role::all(['id', 'name'])->except(1)//exclude the system admin role
         ]);        
@@ -43,7 +45,7 @@ class UserController extends Controller
             'client_id' => $request->client_id,
             'role_id' => $request->role_id,
         ]);
-
+        session()->flash('success', 'User created successfully!');
         return back();
     }
     
@@ -66,6 +68,7 @@ class UserController extends Controller
 
 
         $user->update($validated);
+        session()->flash('success', 'User updated successfully!');
         return back();
     }
 
@@ -75,7 +78,7 @@ class UserController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        return Inertia::render('Users/user-details', [
+        return Inertia::render('admin/admin-user-details', [
             'user' => $user
         ]);
     }
@@ -83,7 +86,8 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index');
+        session()->flash('success', 'User deleted successfully!');
+        return redirect()->route('admin.users.index');
     }
     
     

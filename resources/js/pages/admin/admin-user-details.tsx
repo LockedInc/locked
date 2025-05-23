@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { User, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PageProps } from '@/types';
+import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
+
 
 interface User {
     id: number;
@@ -14,30 +17,26 @@ interface User {
     email: string;
 }
 
-interface UserDetailsProps {
-    user: User;
-}
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Users',
+        href: '/users',
+    },
+    {
+        title: 'User Details',
+        href: '/users/details',
+    },
+];
 
-export default function UserDetails({ user: initialUser }: UserDetailsProps) {
+export default function UserDetails({ user }: PageProps<{ user: User }>) {
     const [isEditing, setIsEditing] = useState(false);
     const { data, setData, put, processing, errors, reset } = useForm({
-        name: initialUser.name,
-        email: initialUser.email,
+        name: user.name,
+        email: user.email,
     });
 
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Users',
-            href: '/users',
-        },
-        {
-            title: 'User Details',
-            href: `/users/${initialUser.id}`,
-        },
-    ];
-
     const handleSave = () => {
-        put(`/users/${initialUser.id}`, {
+        put(`/users/${user.id}`, {
             onSuccess: () => {
                 setIsEditing(false);
             },
@@ -49,12 +48,7 @@ export default function UserDetails({ user: initialUser }: UserDetailsProps) {
         setIsEditing(false);
     };
 
-    const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this user?')) {
-            router.delete(`/users/${initialUser.id}`, {
-            });
-        }
-    };
+
 
 
     return (
@@ -78,12 +72,14 @@ export default function UserDetails({ user: initialUser }: UserDetailsProps) {
                                             variant="outline"
                                             onClick={handleCancel}
                                             disabled={processing}
+                                            className="cursor-pointer"
                                         >
                                             Cancel
                                         </Button>
                                         <Button
                                             onClick={handleSave}
                                             disabled={processing}
+                                            className="cursor-pointer"
                                         >
                                             {processing ? 'Saving...' : 'Save Changes'}
                                         </Button>
@@ -93,16 +89,19 @@ export default function UserDetails({ user: initialUser }: UserDetailsProps) {
                                         <Button
                                             variant="outline"
                                             onClick={() => setIsEditing(true)}
+                                            className="cursor-pointer"
                                         >
                                             Edit Profile
                                         </Button>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={handleDelete}
+                                        <DeleteConfirmation
+                                            onConfirm={() => router.delete(`/users/${user.id}`)}
+                                            itemType="user"
+                                            itemName={user.name}
                                         >
-                                            <Trash2 className="h-4 w-4 mr-2" />
-                                            Delete User
-                                        </Button>
+                                            <Button variant="destructive" className="cursor-pointer">
+                                                Delete User
+                                            </Button>
+                                        </DeleteConfirmation>
                                     </div>
                                 )}
                             </div>

@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             SystemAdminSeeder::class,
             UserSeeder::class,
+            TaskSeeder::class,
+            AgendaSeeder::class,
+            MeetingSeeder::class,
         ]);
     }
 }
