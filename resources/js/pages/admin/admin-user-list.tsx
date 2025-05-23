@@ -10,7 +10,7 @@ import { Plus, ArrowUpDown } from 'lucide-react';
 import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { PageProps } from '@/types';
-import CreateUserDialog from '@/components/ui/create-user-dialog';
+import CreateUserDialog from '@/components/users/create-user-dialog';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,36 +21,19 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
-
 interface User {
     id: number;
     name: string;
     email: string;
+    role: {
+        id: number;
+        name: string;
+    };
 }
+
+
 const columns: ColumnDef<User>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+   
     {
         accessorKey: "name",
         header: ({ column }) => {
@@ -78,6 +61,24 @@ const columns: ColumnDef<User>[] = [
                 </Button>
             )
         },
+    },
+    {
+        accessorKey: "role.name",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Role
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const roleName = row.original.role.name;
+            return roleName === "Client-Admin" ? "Admin" : roleName;
+        }
     },
 ];
 

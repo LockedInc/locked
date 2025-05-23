@@ -15,7 +15,9 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::where('client_id', auth()->user()->client_id)->get();
+        $users = User::where('client_id', auth()->user()->client_id)
+            ->with('role:id,name')
+            ->get();
         return Inertia::render('admin/admin-user-list', [
             'users' => $users,
             'roles' => Role::all(['id', 'name'])->except(1)//exclude the system admin role

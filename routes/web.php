@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Crud\ClientAdmin\UserController as ClientAdminUserController;
+use App\Http\Controllers\Crud\ClientAdmin\TaskController as ClientAdminTaskController;
 use App\Http\Middleware\CheckRole;
 
 Route::get('/', function () {
@@ -14,9 +15,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('tasks', function () {
-        return Inertia::render('admin/admin-task-list');
-    })->name('tasks');
+    // Task routes
+    Route::middleware(['role:Client-Admin'])->group(function () {
+        Route::get('tasks', [ClientAdminTaskController::class, 'index'])->name('admin.tasks.index');
+        Route::post('tasks', [ClientAdminTaskController::class, 'store'])->name('admin.tasks.store');
+        Route::get('tasks/{task}', [ClientAdminTaskController::class, 'show'])->name('admin.tasks.show');
+        Route::put('tasks/{task}', [ClientAdminTaskController::class, 'update'])->name('admin.tasks.update');
+        Route::delete('tasks/{task}', [ClientAdminTaskController::class, 'destroy'])->name('admin.tasks.destroy');
+    });
 
     // Admin Routes
     Route::middleware(['role:Client-Admin'])->group(function () {
