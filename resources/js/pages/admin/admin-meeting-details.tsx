@@ -131,257 +131,256 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                 </div>
 
                 <div className="grid grid-cols-3 gap-6">
-                    <Card className="col-span-2 shadow-sm">
+                    <Card className="col-span-3 shadow-sm">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-lg font-medium">Meeting Details</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-8">
-                                <div className="grid grid-cols-2 gap-8">
-                                    <div className="space-y-2 w-full">
-                                        <Label htmlFor="title" className="text-sm font-medium">Meeting Title</Label>
+                                <div className="grid grid-cols-3 gap-8">
+                                    <div className="col-span-2 space-y-2 w-full">
+                                        <Label htmlFor="agenda_text" className="text-sm font-medium">Agenda</Label>
                                         {isEditing ? (
-                                            <Input
-                                                id="title"
-                                                value={data.title}
-                                                onChange={e => setData('title', e.target.value)}
-                                                error={errors.title}
-                                                className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
+                                            <Textarea
+                                                id="agenda_text"
+                                                value={data.agenda_text}
+                                                onChange={e => setData('agenda_text', e.target.value)}
+                                                error={errors.agenda_text}
+                                                className="min-h-[calc(100vh-400px)] text-sm bg-muted/30 p-4 rounded-md border w-full"
                                             />
                                         ) : (
-                                            <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full">{meeting.title}</div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2 w-full">
-                                        <Label htmlFor="type" className="text-sm font-medium">Meeting Type</Label>
-                                        {isEditing ? (
-                                            <Input
-                                                id="type"
-                                                value={data.type}
-                                                onChange={e => setData('type', e.target.value)}
-                                                error={errors.type}
-                                                className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full"
-                                                placeholder="Type (e.g. Internal, Client, etc.)"
-                                            />
-                                        ) : (
-                                            <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full">
-                                                <Badge className={cn(typeColors[meeting.type as MeetingType], "text-xs font-medium px-2 py-0.5 mr-2")}>{meeting.type}</Badge>
+                                            <div className="min-h-[calc(100vh-400px)] text-sm bg-muted/30 p-4 rounded-md border w-full whitespace-pre-wrap">
+                                                {meeting.agenda_text || 'No agenda set'}
                                             </div>
                                         )}
                                     </div>
-                                </div>
-                                <div className="space-y-2 w-full">
-                                    <Label htmlFor="date" className="text-sm font-medium">Date & Time</Label>
-                                    {isEditing ? (
-                                        <div className="relative">
-                                            <Input
-                                                type="datetime-local"
-                                                id="date"
-                                                value={data.date}
-                                                onChange={e => {
-                                                    const date = new Date(e.target.value);
-                                                    // Set seconds to 0
-                                                    date.setSeconds(0);
-                                                    setData('date', format(date, "yyyy-MM-dd'T'HH:mm"));
-                                                }}
-                                                error={errors.date}
-                                                className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full pl-10"
-                                                step="60"
-                                                onFocus={(e) => {
-                                                    // Remove seconds from the input when focused
-                                                    const date = new Date(e.target.value);
-                                                    date.setSeconds(0);
-                                                    e.target.value = format(date, "yyyy-MM-dd'T'HH:mm");
-                                                }}
-                                            />
-                                            <Calendar className="h-4 w-4 absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+
+                                    <div className="space-y-8">
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="title" className="text-sm font-medium">Meeting Title</Label>
+                                            {isEditing ? (
+                                                <Input
+                                                    id="title"
+                                                    value={data.title}
+                                                    onChange={e => setData('title', e.target.value)}
+                                                    error={errors.title}
+                                                    className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
+                                                />
+                                            ) : (
+                                                <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full">{meeting.title}</div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full">
-                                            <Calendar className="h-4 w-4 mr-2" />
-                                            {meeting.date ? format(new Date(meeting.date), 'EEEE, MMMM d, yyyy • h:mm a') : 'No date set'}
+
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="type" className="text-sm font-medium">Meeting Type</Label>
+                                            {isEditing ? (
+                                                <Input
+                                                    id="type"
+                                                    value={data.type}
+                                                    onChange={e => setData('type', e.target.value)}
+                                                    error={errors.type}
+                                                    className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full"
+                                                    placeholder="Type (e.g. Internal, Client, etc.)"
+                                                />
+                                            ) : (
+                                                <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full">
+                                                    <Badge className={cn(typeColors[meeting.type as MeetingType], "text-xs font-medium px-2 py-0.5 mr-2")}>{meeting.type}</Badge>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                                <div className="space-y-2 w-full">
-                                    <Label htmlFor="agenda_text" className="text-sm font-medium">Agenda</Label>
-                                    {isEditing ? (
-                                        <Textarea
-                                            id="agenda_text"
-                                            value={data.agenda_text}
-                                            onChange={e => setData('agenda_text', e.target.value)}
-                                            error={errors.agenda_text}
-                                            className="min-h-[200px] text-sm bg-muted/30 p-4 rounded-md border w-full"
-                                        />
-                                    ) : (
-                                        <div className="min-h-[200px] text-sm bg-muted/30 p-4 rounded-md border w-full">
-                                            {meeting.agenda_text || 'No agenda set'}
+
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="date" className="text-sm font-medium">Date & Time</Label>
+                                            {isEditing ? (
+                                                <div className="relative">
+                                                    <Input
+                                                        type="datetime-local"
+                                                        id="date"
+                                                        value={data.date}
+                                                        onChange={e => {
+                                                            const date = new Date(e.target.value);
+                                                            // Set seconds to 0
+                                                            date.setSeconds(0);
+                                                            setData('date', format(date, "yyyy-MM-dd'T'HH:mm"));
+                                                        }}
+                                                        error={errors.date}
+                                                        className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full pl-10"
+                                                        step="60"
+                                                        onFocus={(e) => {
+                                                            // Remove seconds from the input when focused
+                                                            const date = new Date(e.target.value);
+                                                            date.setSeconds(0);
+                                                            e.target.value = format(date, "yyyy-MM-dd'T'HH:mm");
+                                                        }}
+                                                    />
+                                                    <Calendar className="h-4 w-4 absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                                                </div>
+                                            ) : (
+                                                <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full">
+                                                    <Calendar className="h-4 w-4 mr-2" />
+                                                    {meeting.date ? format(new Date(meeting.date), 'EEEE, MMMM d, yyyy • h:mm a') : 'No date set'}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
+
+                                        <div className="space-y-2 w-full">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Label className="text-sm font-medium">Attendees</Label>
+                                                    <span className="text-sm text-muted-foreground">
+                                                        ({meeting.users.length})
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {isEditing ? (
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className="w-full justify-between h-10"
+                                                        >
+                                                            Select users...
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-full p-0" align="start">
+                                                        <Command className="max-h-[200px]">
+                                                            <CommandInput placeholder="Search users..." />
+                                                            <CommandEmpty>No users found.</CommandEmpty>
+                                                            <CommandGroup className="overflow-y-auto">
+                                                                {users.map((user) => (
+                                                                    <CommandItem
+                                                                        key={user.id}
+                                                                        onSelect={() => {
+                                                                            const newUsers = data.users.includes(user.id)
+                                                                                ? data.users.filter(id => id !== user.id)
+                                                                                : [...data.users, user.id];
+                                                                            setData('users', newUsers);
+                                                                        }}
+                                                                        className="flex items-center gap-2 px-2 py-1.5"
+                                                                    >
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "h-4 w-4",
+                                                                                data.users.includes(user.id) ? "opacity-100" : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                        <span>{user.name}</span>
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            ) : (
+                                                <div className="space-y-4">
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {meeting.users.length > 0 ? (
+                                                            meeting.users.map((user) => (
+                                                                <Badge 
+                                                                    key={user.id} 
+                                                                    variant="secondary" 
+                                                                    className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
+                                                                    onClick={() => router.visit(`/users/${user.id}?from_meeting=${meeting.id}`)}
+                                                                >
+                                                                    {user.name}
+                                                                </Badge>
+                                                            ))
+                                                        ) : (
+                                                            <span className="text-muted-foreground text-sm">No attendees</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2 w-full">
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Label className="text-sm font-medium">Tasks</Label>
+                                                    <span className="text-sm text-muted-foreground">
+                                                        ({meeting.tasks.length})
+                                                    </span>
+                                                </div>
+                                                {!isEditing && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => setIsCreateTaskOpen(true)}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <Plus className="h-4 w-4 mr-2" />
+                                                        Add Task
+                                                    </Button>
+                                                )}
+                                            </div>
+                                            {isEditing ? (
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className="w-full justify-between h-10"
+                                                        >
+                                                            Select tasks...
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-full p-0" align="start">
+                                                        <Command className="max-h-[200px]">
+                                                            <CommandInput placeholder="Search tasks..." />
+                                                            <CommandEmpty>No tasks found.</CommandEmpty>
+                                                            <CommandGroup className="overflow-y-auto">
+                                                                {tasks.map((task) => (
+                                                                    <CommandItem
+                                                                        key={task.id}
+                                                                        onSelect={() => {
+                                                                            const newTasks = data.tasks.includes(task.id)
+                                                                                ? data.tasks.filter(id => id !== task.id)
+                                                                                : [...data.tasks, task.id];
+                                                                            setData('tasks', newTasks);
+                                                                        }}
+                                                                        className="flex items-center gap-2 px-2 py-1.5"
+                                                                    >
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "h-4 w-4",
+                                                                                data.tasks.includes(task.id) ? "opacity-100" : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                        <span>{task.name}</span>
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            ) : (
+                                                <div className="space-y-4">
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {meeting.tasks.length > 0 ? (
+                                                            meeting.tasks.map((task) => (
+                                                                <Badge key={task.id} 
+                                                                    variant="secondary" 
+                                                                    className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors" 
+                                                                    onClick={() => router.visit(`/tasks/${task.id}?from_meeting=${meeting.id}`)}
+                                                                >
+                                                                    {task.name}
+                                                                </Badge>
+                                                            ))
+                                                        ) : (
+                                                            <span className="text-muted-foreground text-sm">No tasks</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                         </CardContent>
                     </Card>
-
-                    <div className="space-y-6 col-span-1">
-                        <Card className="shadow-sm h-[calc(50%-12px)]">
-                            <CardHeader className="pb-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <CardTitle className="text-lg font-medium">Attendees</CardTitle>
-                                        <span className="text-sm text-muted-foreground">
-                                            ({meeting.users.length})
-                                        </span>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="h-[calc(100%-80px)] overflow-y-auto">
-                                {isEditing ? (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                role="combobox"
-                                                className="w-full justify-between h-10"
-                                            >
-                                                Select users...
-                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-full p-0" align="start">
-                                            <Command className="max-h-[200px]">
-                                                <CommandInput placeholder="Search users..." />
-                                                <CommandEmpty>No users found.</CommandEmpty>
-                                                <CommandGroup className="overflow-y-auto">
-                                                    {users.map((user) => (
-                                                        <CommandItem
-                                                            key={user.id}
-                                                            onSelect={() => {
-                                                                const newUsers = data.users.includes(user.id)
-                                                                    ? data.users.filter(id => id !== user.id)
-                                                                    : [...data.users, user.id];
-                                                                setData('users', newUsers);
-                                                            }}
-                                                            className="flex items-center gap-2 px-2 py-1.5"
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "h-4 w-4",
-                                                                    data.users.includes(user.id) ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            <span>{user.name}</span>
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                ) : (
-                                    <div className="space-y-4">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {meeting.users.length > 0 ? (
-                                                meeting.users.map((user) => (
-                                                    <Badge 
-                                                        key={user.id} 
-                                                        variant="secondary" 
-                                                        className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
-                                                        onClick={() => router.visit(`/users/${user.id}?from_meeting=${meeting.id}`)}
-                                                    >
-                                                        {user.name}
-                                                    </Badge>
-                                                ))
-                                            ) : (
-                                                <span className="text-muted-foreground text-sm">No attendees</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        <Card className="shadow-sm h-[calc(50%-12px)]">
-                            <CardHeader className="pb-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <CardTitle className="text-lg font-medium">Related Tasks</CardTitle>
-                                        <span className="text-sm text-muted-foreground">
-                                            ({meeting.tasks.length})
-                                        </span>
-                                    </div>
-                                    <Button 
-                                        onClick={() => setIsCreateTaskOpen(true)} 
-                                        className="cursor-pointer"
-                                    >
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Add Task
-                                    </Button>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="h-[calc(100%-80px)] overflow-y-auto">
-                                {isEditing ? (
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                role="combobox"
-                                                className="w-full justify-between h-10"
-                                            >
-                                                Select tasks...
-                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-full p-0" align="start">
-                                            <Command className="max-h-[200px]">
-                                                <CommandInput placeholder="Search tasks..." />
-                                                <CommandEmpty>No tasks found.</CommandEmpty>
-                                                <CommandGroup className="overflow-y-auto">
-                                                    {tasks.map((task) => (
-                                                        <CommandItem
-                                                            key={task.id}
-                                                            onSelect={() => {
-                                                                const newTasks = data.tasks.includes(task.id)
-                                                                    ? data.tasks.filter(id => id !== task.id)
-                                                                    : [...data.tasks, task.id];
-                                                                setData('tasks', newTasks);
-                                                            }}
-                                                            className="flex items-center gap-2 px-2 py-1.5"
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "h-4 w-4",
-                                                                    data.tasks.includes(task.id) ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            <span>{task.name}</span>
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                ) : (
-                                    <div className="space-y-4">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {meeting.tasks.length > 0 ? (
-                                                meeting.tasks.map((task) => (
-                                                    <Badge key={task.id} 
-                                                        variant="secondary" 
-                                                        className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors" 
-                                                        onClick={() => router.visit(`/tasks/${task.id}?from_meeting=${meeting.id}`)}
-                                                    >
-                                                        {task.name}
-                                                    </Badge>
-                                                ))
-                                            ) : (
-                                                <span className="text-muted-foreground text-sm">No tasks</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
                 </div>
                 <div className="mt-6">
                     <Button variant="outline" onClick={() => router.visit('/meetings')} className="cursor-pointer">
