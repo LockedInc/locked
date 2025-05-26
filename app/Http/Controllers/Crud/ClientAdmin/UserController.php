@@ -72,14 +72,15 @@ class UserController extends Controller
         return back();
     }
 
-    public function show(User $user)
+    public function show(User $user, Request $request)
     {
         if ($user->client_id !== auth()->user()->client_id) {
             abort(403, 'Unauthorized');
         }
 
         return Inertia::render('admin/admin-user-details', [
-            'user' => $user
+            'user' => $user,
+            'from_meeting' => $request->query('from_meeting')
         ]);
     }
 

@@ -58,6 +58,17 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
         tasks: meeting.tasks.map(task => task.id)
     });
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Meetings',
+            href: '/meetings',
+        },
+        {
+            title: meeting.title,
+            href: `/meetings/${meeting.id}`,
+        },
+    ];
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put(`/meetings/${meeting.id}`, {
@@ -275,7 +286,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                         key={user.id} 
                                                         variant="secondary" 
                                                         className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
-                                                        onClick={() => router.visit(`/users/${user.id}`)}
+                                                        onClick={() => router.visit(`/users/${user.id}?from_meeting=${meeting.id}`)}
                                                     >
                                                         {user.name}
                                                     </Badge>
@@ -357,7 +368,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                     <Badge key={task.id} 
                                                         variant="secondary" 
                                                         className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors" 
-                                                        onClick={() => router.visit(`/tasks/${task.id}`)}
+                                                        onClick={() => router.visit(`/tasks/${task.id}?from_meeting=${meeting.id}`)}
                                                     >
                                                         {task.name}
                                                     </Badge>

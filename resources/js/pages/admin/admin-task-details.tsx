@@ -12,27 +12,17 @@ import { Task, TaskStatus, TaskPriority, User } from '@/types/task';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { Check, ChevronsUpDown, Trash2, Calendar, Users, AlertCircle } from "lucide-react"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Tasks',
-        href: '/tasks',
-    },
-    {
-        title: 'Task Details',
-        href: '#',
-    },
-];
-
 interface PageProps {
     task: Task;
     all_users: User[];
+    from_meeting?: number;
 }
 
 const statusColors = {
@@ -57,6 +47,30 @@ export default function TaskDetails({ task, all_users }: PageProps) {
         due_date: task.due_date,
         users: task.users.map(user => user.id)
     });
+    const { props } = usePage();
+    const fromMeetingId = props.from_meeting;
+    
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Meetings',
+            href: '/meetings',
+        },
+        ...(fromMeetingId ? [
+            {
+                title: 'Meeting Details',
+                href: `/meetings/${fromMeetingId}`,
+            }
+        ] : [
+            {
+                title: 'Tasks',
+                href: '/tasks',
+            }
+        ]),
+        {
+            title: task.name,
+            href: '#',
+        },
+    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,8 +84,6 @@ export default function TaskDetails({ task, all_users }: PageProps) {
     const handleCancel = () => {
         setIsEditing(false);
     };
-
-
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -281,7 +293,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                                             key={user.id} 
                                                             variant="secondary" 
                                                             className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
-                                                            onClick={() => router.visit(`/users/${user.id}`)}
+                                                            onClick={() => router.visit(`/users/${user.id}?from_meeting=${fromMeetingId}`)}
                                                         >
                                                             {user.name}
                                                         </Badge>
@@ -298,9 +310,15 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                     </CardContent>
                 </Card>
                 <div className="mt-6">
-                    <Button variant="outline" onClick={() => router.visit('/tasks')} className="cursor-pointer">
-                        ← Back to Tasks List
-                    </Button>
+                    {fromMeetingId ? (
+                        <Button variant="outline" onClick={() => router.visit(`/meetings/${fromMeetingId}`)} className="cursor-pointer">
+                            ← Back to Meeting
+                        </Button>
+                    ) : (
+                        <Button variant="outline" onClick={() => router.visit('/tasks')} className="cursor-pointer">
+                            ← Back to Tasks List
+                        </Button>
+                    )}
                 </div>
             </div>
         </AppLayout>

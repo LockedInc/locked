@@ -1,39 +1,54 @@
 import React, { useState } from 'react';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Trash2 } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PageProps } from '@/types';
-import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
 
-
-interface User {
+interface UserData {
     id: number;
     name: string;
     email: string;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Users',
-        href: '/users',
-    },
-    {
-        title: 'User Details',
-        href: '/users/details',
-    },
-];
+interface PageProps {
+    user: UserData;
+    from_meeting?: number;
+}
 
-export default function UserDetails({ user }: PageProps<{ user: User }>) {
+export default function UserDetails({ user }: PageProps) {
     const [isEditing, setIsEditing] = useState(false);
     const { data, setData, put, processing, errors, reset } = useForm({
         name: user.name,
         email: user.email,
     });
+    const { props } = usePage();
+    const fromMeetingId = props.from_meeting;
+    
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Meetings',
+            href: '/meetings',
+        },
+        ...(fromMeetingId ? [
+            {
+                title: 'Meeting Details',
+                href: `/meetings/${fromMeetingId}`,
+            }
+        ] : [
+            {
+                title: 'Users',
+                href: '/users',
+            }
+        ]),
+        {
+            title: user.name,
+            href: '#',
+        },
+    ];
 
     const handleSave = () => {
         put(`/users/${user.id}`, {
@@ -48,9 +63,6 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
         setIsEditing(false);
     };
 
-
-
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`User: ${data.name}`} />
@@ -64,99 +76,29 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
                                 </div>
                                 <CardTitle className="text-2xl font-semibold">{data.name}</CardTitle>
                             </div>
-
-                            <div className="flex items-center gap-2">
-                                {isEditing ? (
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            onClick={handleCancel}
-                                            disabled={processing}
-                                            className="cursor-pointer"
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            onClick={handleSave}
-                                            disabled={processing}
-                                            className="cursor-pointer"
-                                        >
-                                            {processing ? 'Saving...' : 'Save Changes'}
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => setIsEditing(true)}
-                                            className="cursor-pointer"
-                                        >
-                                            Edit Profile
-                                        </Button>
-                                        <DeleteConfirmation
-                                            onConfirm={() => router.delete(`/users/${user.id}`)}
-                                            itemType="user"
-                                            itemName={user.name}
-                                        >
-                                            <Button variant="destructive" className="cursor-pointer">
-                                                Delete User
-                                            </Button>
-                                        </DeleteConfirmation>
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
-
-                                {/* Edit Profile */}
-                                {isEditing ? (
-                                    <div className="space-y-1">
-                                        <Input
-                                            id="name"
-                                            value={data.name}
-                                            onChange={e => setData('name', e.target.value)}
-                                            className="w-full"
-                                            disabled={processing}
-                                        />
-                                        {errors.name && (
-                                            <p className="text-sm text-red-500">{errors.name}</p>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <p className="text-lg">{data.name}</p>
-                                )}
+                                <p className="text-lg">{data.name}</p>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
-                                {isEditing ? (
-                                    <div className="space-y-1">
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            value={data.email}
-                                            onChange={e => setData('email', e.target.value)}
-                                            className="w-full"
-                                            disabled={processing}
-                                        />
-                                        {errors.email && (
-                                            <p className="text-sm text-red-500">{errors.email}</p>
-                                        )}
-                                    </div>
+                                <p className="text-lg">{data.email}</p>
+                            </div>
+                            <div className="mt-6">
+                                {fromMeetingId ? (
+                                    <Button variant="outline" onClick={() => router.visit(`/meetings/${fromMeetingId}`)} className="cursor-pointer">
+                                        ← Back to Meeting
+                                    </Button>
                                 ) : (
-                                    <p className="text-lg">{data.email}</p>
+                                    <Button variant="outline" onClick={() => router.visit('/users')} className="cursor-pointer">
+                                        ← Back to Users List
+                                    </Button>
                                 )}
                             </div>
-                            {!isEditing && (
-                                <div className="pt-4">
-                                    <Button asChild variant="outline" className="w-full sm:w-auto">
-                                        <Link href="/users">Back to User List</Link>
-                                    </Button>
-                                </div>
-                            )}
                         </div>
                     </CardContent>
                 </Card>

@@ -65,7 +65,7 @@ class TaskController extends Controller
         return back();
     }   
 
-    public function show(Task $task)
+    public function show(Task $task, Request $request)
     {
         // Ensure the task belongs to the user's client
         if ($task->client_id !== auth()->user()->client->id) {
@@ -84,7 +84,8 @@ class TaskController extends Controller
                 $query->where('users.client_id', $clientId)
                     ->select('users.id', 'users.name', 'users.email');
             }]),
-            'all_users' => $all_users
+            'all_users' => $all_users,
+            'from_meeting' => $request->query('from_meeting')
         ]);
     }
 
