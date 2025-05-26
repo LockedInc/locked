@@ -12,7 +12,7 @@ import { Meeting } from '@/types/meeting';
 import { User, Task } from '@/types/task';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { useForm } from '@inertiajs/react';
 import { Check, ChevronsUpDown, Trash2, Calendar, Users, ListTodo, Plus } from "lucide-react"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
@@ -51,7 +51,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
     const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
     const { data, setData, put, processing, errors } = useForm({
         title: meeting.title,
-        date: meeting.date,
+        date: meeting.date ? format(new Date(meeting.date), "yyyy-MM-dd'T'HH:mm") : '',
         type: meeting.type,
         agenda_text: meeting.agenda_text,
         users: meeting.users.map(user => user.id),
@@ -162,14 +162,29 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                 <div className="space-y-2 w-full">
                                     <Label htmlFor="date" className="text-sm font-medium">Date & Time</Label>
                                     {isEditing ? (
-                                        <Input
-                                            type="datetime-local"
-                                            id="date"
-                                            value={data.date ? new Date(data.date).toISOString().slice(0, 16) : ''}
-                                            onChange={e => setData('date', e.target.value)}
-                                            error={errors.date}
-                                            className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full"
-                                        />
+                                        <div className="relative">
+                                            <Input
+                                                type="datetime-local"
+                                                id="date"
+                                                value={data.date}
+                                                onChange={e => {
+                                                    const date = new Date(e.target.value);
+                                                    // Set seconds to 0
+                                                    date.setSeconds(0);
+                                                    setData('date', format(date, "yyyy-MM-dd'T'HH:mm"));
+                                                }}
+                                                error={errors.date}
+                                                className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full pl-10"
+                                                step="60"
+                                                onFocus={(e) => {
+                                                    // Remove seconds from the input when focused
+                                                    const date = new Date(e.target.value);
+                                                    date.setSeconds(0);
+                                                    e.target.value = format(date, "yyyy-MM-dd'T'HH:mm");
+                                                }}
+                                            />
+                                            <Calendar className="h-4 w-4 absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                                        </div>
                                     ) : (
                                         <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full">
                                             <Calendar className="h-4 w-4 mr-2" />
