@@ -9,7 +9,7 @@ import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { format } from 'date-fns';
+import { format, isAfter } from 'date-fns';
 import { Meeting } from '@/types/meeting';
 import { Task, User } from '@/types/task';
 import { CreateMeetingDialog } from '@/components/meetings/create-meeting-dialog';
@@ -44,15 +44,26 @@ const columns: ColumnDef<Meeting>[] = [
             )
         },
         cell: ({ row }) => {
-            const meeting = row.original
+            const meeting = row.original;
+            const now = new Date();
+            const meetingDate = new Date(meeting.date);
+            const isUpcoming = isAfter(meetingDate, now);
             return (
                 <div>
                     <div className="font-medium">{meeting.title}</div>
-                    <div className="text-sm text-muted-foreground">
-                        {meeting.type}
+                    <div>
+                        <span
+                            className={
+                                isUpcoming
+                                    ? "px-1.5 py-0.5 rounded text-[10px] font-semibold bg-green-100 text-green-800"
+                                    : "px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-200 text-gray-700"
+                            }
+                        >
+                            {isUpcoming ? "Upcoming" : "Past"}
+                        </span>
                     </div>
                 </div>
-            )
+            );
         },
     },
     {
@@ -95,10 +106,8 @@ const columns: ColumnDef<Meeting>[] = [
         },
         cell: ({ row }) => {
             return (
-                <Badge variant="secondary">
-                    {row.getValue("type")}
-                </Badge>
-            )
+                <span className="text-sm text-muted-foreground">{row.getValue("type")}</span>
+            );
         },
     },
     {

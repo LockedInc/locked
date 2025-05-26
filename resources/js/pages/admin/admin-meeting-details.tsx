@@ -127,7 +127,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 <div className="grid grid-cols-2 gap-8">
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 w-full">
                                         <Label htmlFor="title" className="text-sm font-medium">Meeting Title</Label>
                                         {isEditing ? (
                                             <Input
@@ -135,14 +135,13 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                 value={data.title}
                                                 onChange={e => setData('title', e.target.value)}
                                                 error={errors.title}
-                                                className="h-10"
+                                                className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
                                             />
                                         ) : (
-                                            <div className="text-lg font-medium mt-2 h-10 flex items-center text-foreground">{meeting.title}</div>
+                                            <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full">{meeting.title}</div>
                                         )}
                                     </div>
-
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 w-full">
                                         <Label htmlFor="type" className="text-sm font-medium">Meeting Type</Label>
                                         {isEditing ? (
                                             <Input
@@ -150,20 +149,17 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                 value={data.type}
                                                 onChange={e => setData('type', e.target.value)}
                                                 error={errors.type}
-                                                className="h-10"
+                                                className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full"
                                                 placeholder="Type (e.g. Internal, Client, etc.)"
                                             />
                                         ) : (
-                                            <div className="mt-2 h-10 flex items-center">
-                                                <Badge className={cn(typeColors[meeting.type as MeetingType], "text-sm font-medium px-3 py-1")}>
-                                                    {meeting.type}
-                                                </Badge>
+                                            <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full">
+                                                <Badge className={cn(typeColors[meeting.type as MeetingType], "text-xs font-medium px-2 py-0.5 mr-2")}>{meeting.type}</Badge>
                                             </div>
                                         )}
                                     </div>
                                 </div>
-
-                                <div className="space-y-2">
+                                <div className="space-y-2 w-full">
                                     <Label htmlFor="date" className="text-sm font-medium">Date & Time</Label>
                                     {isEditing ? (
                                         <Input
@@ -172,17 +168,16 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                             value={data.date ? new Date(data.date).toISOString().slice(0, 16) : ''}
                                             onChange={e => setData('date', e.target.value)}
                                             error={errors.date}
-                                            className="h-10"
+                                            className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full"
                                         />
                                     ) : (
-                                        <div className="flex items-center text-muted-foreground mt-2 h-10">
+                                        <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full">
                                             <Calendar className="h-4 w-4 mr-2" />
                                             {meeting.date ? format(new Date(meeting.date), 'EEEE, MMMM d, yyyy • h:mm a') : 'No date set'}
                                         </div>
                                     )}
                                 </div>
-
-                                <div className="space-y-2">
+                                <div className="space-y-2 w-full">
                                     <Label htmlFor="agenda_text" className="text-sm font-medium">Agenda</Label>
                                     {isEditing ? (
                                         <Textarea
@@ -190,10 +185,10 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                             value={data.agenda_text}
                                             onChange={e => setData('agenda_text', e.target.value)}
                                             error={errors.agenda_text}
-                                            className="min-h-[200px]"
+                                            className="min-h-[200px] text-sm bg-muted/30 p-4 rounded-md border w-full"
                                         />
                                     ) : (
-                                        <div className="text-muted-foreground bg-muted/30 p-4 rounded-md mt-2 min-h-[200px]">
+                                        <div className="min-h-[200px] text-sm bg-muted/30 p-4 rounded-md border w-full">
                                             {meeting.agenda_text || 'No agenda set'}
                                         </div>
                                     )}
@@ -202,12 +197,19 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                         </CardContent>
                     </Card>
 
-                    <div className="space-y-6">
-                        <Card className="shadow-sm">
+                    <div className="space-y-6 col-span-1">
+                        <Card className="shadow-sm h-[calc(50%-12px)]">
                             <CardHeader className="pb-4">
-                                <CardTitle className="text-lg font-medium">Attendees</CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <CardTitle className="text-lg font-medium">Attendees</CardTitle>
+                                        <span className="text-sm text-muted-foreground">
+                                            ({meeting.users.length})
+                                        </span>
+                                    </div>
+                                </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="h-[calc(100%-80px)] overflow-y-auto">
                                 {isEditing ? (
                                     <Popover>
                                         <PopoverTrigger asChild>
@@ -216,9 +218,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                 role="combobox"
                                                 className="w-full justify-between h-10"
                                             >
-                                                {data.users.length > 0
-                                                    ? `${data.users.length} users selected`
-                                                    : "Select users..."}
+                                                Select users...
                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                             </Button>
                                         </PopoverTrigger>
@@ -253,12 +253,6 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                     </Popover>
                                 ) : (
                                     <div className="space-y-4">
-                                        <div className="flex items-center text-muted-foreground">
-                                            <Users className="h-4 w-4 mr-2" />
-                                            {meeting.users.length > 0 
-                                                ? `${meeting.users.length} ${meeting.users.length === 1 ? 'Attendee' : 'Attendees'}`
-                                                : 'No Attendees'}
-                                        </div>
                                         <div className="flex flex-wrap gap-1.5">
                                             {meeting.users.length > 0 ? (
                                                 meeting.users.map((user) => (
@@ -272,7 +266,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                     </Badge>
                                                 ))
                                             ) : (
-                                                <span className="text-muted-foreground text-sm">None</span>
+                                                <span className="text-muted-foreground text-sm">No attendees</span>
                                             )}
                                         </div>
                                     </div>
@@ -280,10 +274,15 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                             </CardContent>
                         </Card>
 
-                        <Card className="shadow-sm">
+                        <Card className="shadow-sm h-[calc(50%-12px)]">
                             <CardHeader className="pb-4">
                                 <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg font-medium">Related Tasks</CardTitle>
+                                    <div className="flex items-center gap-2">
+                                        <CardTitle className="text-lg font-medium">Related Tasks</CardTitle>
+                                        <span className="text-sm text-muted-foreground">
+                                            ({meeting.tasks.length})
+                                        </span>
+                                    </div>
                                     <Button 
                                         onClick={() => setIsCreateTaskOpen(true)} 
                                         className="cursor-pointer"
@@ -293,7 +292,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                     </Button>
                                 </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="h-[calc(100%-80px)] overflow-y-auto">
                                 {isEditing ? (
                                     <Popover>
                                         <PopoverTrigger asChild>
@@ -302,9 +301,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                 role="combobox"
                                                 className="w-full justify-between h-10"
                                             >
-                                                {data.tasks.length > 0
-                                                    ? `${data.tasks.length} tasks selected`
-                                                    : "Select tasks..."}
+                                                Select tasks...
                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                             </Button>
                                         </PopoverTrigger>
@@ -339,12 +336,6 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                     </Popover>
                                 ) : (
                                     <div className="space-y-4">
-                                        <div className="flex items-center text-muted-foreground">
-                                            <ListTodo className="h-4 w-4 mr-2" />
-                                            {meeting.tasks.length > 0 
-                                                ? `${meeting.tasks.length} ${meeting.tasks.length === 1 ? 'Task' : 'Tasks'}`
-                                                : 'No Tasks'}
-                                        </div>
                                         <div className="flex flex-wrap gap-1.5">
                                             {meeting.tasks.length > 0 ? (
                                                 meeting.tasks.map((task) => (
@@ -357,7 +348,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                     </Badge>
                                                 ))
                                             ) : (
-                                                <span className="text-muted-foreground text-sm">None</span>
+                                                <span className="text-muted-foreground text-sm">No tasks</span>
                                             )}
                                         </div>
                                     </div>

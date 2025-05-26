@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { Task, TaskStatus, User } from '@/types/task';
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
 import { AdminTaskStats } from '@/components/tasks/admin-task-stats';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -133,13 +134,12 @@ const columns: ColumnDef<Task>[] = [
 
 export default function Tasks({ tasks, users }: PageProps) {
     const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
-    const { url } = usePage();
-    const params = new URLSearchParams(url.split('?')[1]);
-    const statusFilter = params.get('status');
+    const [selectedUser, setSelectedUser] = useState<string>('all');
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
-    const filteredTasks = statusFilter
-        ? tasks.filter((task) => task.status === statusFilter)
-        : tasks;
+    const filteredTasks = tasks
+        .filter(task => selectedStatus === 'all' || task.status === selectedStatus)
+        .filter(task => selectedUser === 'all' || task.users.some(u => String(u.id) === selectedUser));
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -152,20 +152,30 @@ export default function Tasks({ tasks, users }: PageProps) {
                     </div>
                 </div>
 
-                {statusFilter && (
-                    <div className="mb-4 flex items-center gap-2 px-6">
-                        <span className="text-sm text-muted-foreground">Showing tasks with status:</span>
-                        <Badge variant="outline" className="font-medium">{statusFilter.replace('_', ' ')}</Badge>
-                        <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            onClick={() => router.visit('/tasks')} 
-                            className="h-7 px-2 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
-                        >
-                            Clear filter
-                        </Button>
-                    </div>
-                )}
+                <div className="flex items-center gap-4 px-6 mb-4 ">
+                    <Select value={selectedStatus} onValueChange={setSelectedStatus} >
+                        <SelectTrigger className="w-[200px] cursor-pointer">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all" className="cursor-pointer">All Statuses</SelectItem>
+                            <SelectItem value="pending" className="cursor-pointer hover:bg-muted/50">Pending</SelectItem>
+                            <SelectItem value="in_progress" className="cursor-pointer hover:bg-muted/50">In Progress</SelectItem>
+                            <SelectItem value="completed" className="cursor-pointer hover:bg-muted/50">Completed</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select value={selectedUser} onValueChange={setSelectedUser}>
+                        <SelectTrigger className="w-[200px] cursor-pointer">
+                            <SelectValue placeholder="Filter by user" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all" className="cursor-pointer">All Users</SelectItem>
+                            {users.map(user => (
+                                <SelectItem key={user.id} value={String(user.id)} className="cursor-pointer hover:bg-muted/50">{user.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
 
                 <Card>
                     <CardContent className="pt-6 ">
