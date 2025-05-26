@@ -233,46 +233,62 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                 </div>
                                             </div>
                                             {isEditing ? (
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            role="combobox"
-                                                            className="w-full justify-between h-10"
-                                                        >
-                                                            Select users...
-                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-full p-0" align="start">
-                                                        <Command className="max-h-[200px]">
-                                                            <CommandInput placeholder="Search users..." />
-                                                            <CommandEmpty>No users found.</CommandEmpty>
-                                                            <CommandGroup className="overflow-y-auto">
-                                                                {users.map((user) => (
-                                                                    <CommandItem
-                                                                        key={user.id}
-                                                                        onSelect={() => {
-                                                                            const newUsers = data.users.includes(user.id)
-                                                                                ? data.users.filter(id => id !== user.id)
-                                                                                : [...data.users, user.id];
-                                                                            setData('users', newUsers);
-                                                                        }}
-                                                                        className="flex items-center gap-2 px-2 py-1.5"
-                                                                    >
-                                                                        <Check
-                                                                            className={cn(
-                                                                                "h-4 w-4",
-                                                                                data.users.includes(user.id) ? "opacity-100" : "opacity-0"
-                                                                            )}
-                                                                        />
-                                                                        <span>{user.name}</span>
-                                                                    </CommandItem>
-                                                                ))}
-                                                            </CommandGroup>
-                                                        </Command>
-                                                    </PopoverContent>
-                                                </Popover>
+                                                <>
+                                                    <div className="flex flex-wrap gap-1.5 mb-4">
+                                                        {users
+                                                            .filter(user => data.users.includes(user.id))
+                                                            .map((user) => (
+                                                                <Badge 
+                                                                    key={user.id} 
+                                                                    variant="secondary" 
+                                                                    className="text-sm bg-muted/50"
+                                                                >
+                                                                    {user.name}
+                                                                </Badge>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button
+                                                                variant="outline"
+                                                                role="combobox"
+                                                                className="w-full justify-between h-10"
+                                                            >
+                                                                Select users...
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-full p-0" align="start">
+                                                            <Command className="max-h-[200px]">
+                                                                <CommandInput placeholder="Search users..." />
+                                                                <CommandEmpty>No users found.</CommandEmpty>
+                                                                <CommandGroup className="overflow-y-auto">
+                                                                    {users.map((user) => (
+                                                                        <CommandItem
+                                                                            key={user.id}
+                                                                            onSelect={() => {
+                                                                                const newUsers = data.users.includes(user.id)
+                                                                                    ? data.users.filter(id => id !== user.id)
+                                                                                    : [...data.users, user.id];
+                                                                                setData('users', newUsers);
+                                                                            }}
+                                                                            className="flex items-center gap-2 px-2 py-1.5"
+                                                                        >
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "h-4 w-4",
+                                                                                    data.users.includes(user.id) ? "opacity-100" : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                            <span>{user.name}</span>
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            </Command>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </>
                                             ) : (
                                                 <div className="space-y-4">
                                                     <div className="flex flex-wrap gap-1.5">
@@ -316,46 +332,62 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                 )}
                                             </div>
                                             {isEditing ? (
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            role="combobox"
-                                                            className="w-full justify-between h-10"
-                                                        >
-                                                            Select tasks...
-                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-full p-0" align="start">
-                                                        <Command className="max-h-[200px]">
-                                                            <CommandInput placeholder="Search tasks..." />
-                                                            <CommandEmpty>No tasks found.</CommandEmpty>
-                                                            <CommandGroup className="overflow-y-auto">
-                                                                {tasks.map((task) => (
-                                                                    <CommandItem
-                                                                        key={task.id}
-                                                                        onSelect={() => {
-                                                                            const newTasks = data.tasks.includes(task.id)
-                                                                                ? data.tasks.filter(id => id !== task.id)
-                                                                                : [...data.tasks, task.id];
-                                                                            setData('tasks', newTasks);
-                                                                        }}
-                                                                        className="flex items-center gap-2 px-2 py-1.5"
-                                                                    >
-                                                                        <Check
-                                                                            className={cn(
-                                                                                "h-4 w-4",
-                                                                                data.tasks.includes(task.id) ? "opacity-100" : "opacity-0"
-                                                                            )}
-                                                                        />
-                                                                        <span>{task.name}</span>
-                                                                    </CommandItem>
-                                                                ))}
-                                                            </CommandGroup>
-                                                        </Command>
-                                                    </PopoverContent>
-                                                </Popover>
+                                                <>
+                                                    <div className="flex flex-wrap gap-1.5 mb-4">
+                                                        {tasks
+                                                            .filter(task => data.tasks.includes(task.id))
+                                                            .map((task) => (
+                                                                <Badge 
+                                                                    key={task.id} 
+                                                                    variant="secondary" 
+                                                                    className="text-sm bg-muted/50"
+                                                                >
+                                                                    {task.name}
+                                                                </Badge>
+                                                            ))
+                                                        }
+                                                    </div>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button
+                                                                variant="outline"
+                                                                role="combobox"
+                                                                className="w-full justify-between h-10"
+                                                            >
+                                                                Select tasks...
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-full p-0" align="start">
+                                                            <Command className="max-h-[200px]">
+                                                                <CommandInput placeholder="Search tasks..." />
+                                                                <CommandEmpty>No tasks found.</CommandEmpty>
+                                                                <CommandGroup className="overflow-y-auto">
+                                                                    {tasks.map((task) => (
+                                                                        <CommandItem
+                                                                            key={task.id}
+                                                                            onSelect={() => {
+                                                                                const newTasks = data.tasks.includes(task.id)
+                                                                                    ? data.tasks.filter(id => id !== task.id)
+                                                                                    : [...data.tasks, task.id];
+                                                                                setData('tasks', newTasks);
+                                                                            }}
+                                                                            className="flex items-center gap-2 px-2 py-1.5"
+                                                                        >
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "h-4 w-4",
+                                                                                    data.tasks.includes(task.id) ? "opacity-100" : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                            <span>{task.name}</span>
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            </Command>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </>
                                             ) : (
                                                 <div className="space-y-4">
                                                     <div className="flex flex-wrap gap-1.5">
