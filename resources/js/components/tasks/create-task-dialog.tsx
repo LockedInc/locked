@@ -35,7 +35,7 @@ export function CreateTaskDialog({ users, open, onOpenChange, meetingId }: Creat
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/tasks', {
+        post('/admin/tasks', {
             onSuccess: () => {
                 reset();
                 onOpenChange(false);

@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Tasks',
-        href: '/admin/tasks',
+        href: '/tasks',
     },
 ];
 
@@ -184,7 +184,7 @@ export default function Tasks({ tasks, users }: PageProps) {
                             data={filteredTasks}
                             searchPlaceholder="Search tasks..."
                             searchColumn="name"
-                            onRowClick={(task) => router.visit(`/admin/tasks/${task.id}`)}
+                            onRowClick={(task) => router.visit(`/tasks/${task.id}`)}
                             addButton={
                                 <Button onClick={() => setIsTaskDialogOpen(true)} className="cursor-pointer">
                                     <Plus className="mr-2 h-4 w-4" />

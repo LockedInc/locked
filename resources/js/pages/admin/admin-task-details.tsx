@@ -22,7 +22,7 @@ import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Tasks',
-        href: '/tasks',
+        href: '/admin/tasks',
     },
     {
         title: 'Task Details',
@@ -60,7 +60,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/tasks/${task.id}`, {
+        put(`/admin/tasks/${task.id}`, {
             onSuccess: () => {
                 setIsEditing(false);
             }
@@ -95,7 +95,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                     Edit Task
                                 </Button>
                                 <DeleteConfirmation
-                                    onConfirm={() => router.delete(`/tasks/${task.id}`)}
+                                    onConfirm={() => router.delete(`/admin/tasks/${task.id}`)}
                                     itemType="task"
                                     itemName={task.name}
                                 >
@@ -281,7 +281,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                                             key={user.id} 
                                                             variant="secondary" 
                                                             className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
-                                                            onClick={() => router.visit(`/users/${user.id}`)}
+                                                            onClick={() => router.visit(`/admin/users/${user.id}`)}
                                                         >
                                                             {user.name}
                                                         </Badge>
@@ -298,7 +298,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                     </CardContent>
                 </Card>
                 <div className="mt-6">
-                    <Button variant="outline" onClick={() => router.visit('/tasks')} className="cursor-pointer">
+                    <Button variant="outline" onClick={() => router.visit('/admin/tasks')} className="cursor-pointer">
                         ← Back to Tasks List
                     </Button>
                 </div>

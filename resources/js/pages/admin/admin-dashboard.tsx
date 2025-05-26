@@ -13,7 +13,7 @@ import { UserWorkloadChart } from '@/components/dashboard/user-workload-chart';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: '/admin/dashboard',
     },
 ];
 

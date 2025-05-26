@@ -26,7 +26,7 @@ export function CreateMeetingDialog({ open, onOpenChange, users, tasks }: Create
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        post('/meetings', {
+        post('/admin/meetings', {
             onSuccess: () => {
                 reset()
                 onOpenChange(false)

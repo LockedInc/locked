@@ -18,7 +18,7 @@ import { MeetingSummary } from '@/components/meetings/meeting-summary';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Meetings',
-        href: '/meetings',
+        href: '/admin/meetings',
     },
 ];
 
@@ -187,7 +187,7 @@ export default function Meetings({ meetings, users, tasks }: PageProps) {
                             data={meetings}
                             searchPlaceholder="Search meetings..."
                             searchColumn="title"
-                            onRowClick={(meeting) => router.visit(`/meetings/${meeting.id}`)}
+                            onRowClick={(meeting) => router.visit(`/admin/meetings/${meeting.id}`)}
                             addButton={
                                 <Button onClick={() => setIsMeetingDialogOpen(true)} className="cursor-pointer">
                                     <Plus className="mr-2 h-4 w-4" />

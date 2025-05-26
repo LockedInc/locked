@@ -15,7 +15,7 @@ import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Users',
-        href: '/users',
+        href: '/admin/users',
     },
 ];
 
@@ -132,7 +132,7 @@ export default function Users({ users }: PageProps<{ users: User[] }>) {
                             data={users}
                             searchPlaceholder="Search users..."
                             searchColumn="name"
-                            onRowClick={(user) => router.visit(`/users/${user.id}`)}
+                            onRowClick={(user) => router.visit(`/admin/users/${user.id}`)}
                             addButton={
                                 <Button onClick={() => setIsUserDialogOpen(true)} className="cursor-pointer">
                                     <Plus className="mr-2 h-4 w-4" />

@@ -20,11 +20,11 @@ interface User {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Users',
-        href: '/users',
+        href: '/admin/users',
     },
     {
         title: 'User Details',
-        href: '/users/details',
+        href: '/admin/users/details',
     },
 ];
 
@@ -36,7 +36,7 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
     });
 
     const handleSave = () => {
-        put(`/users/${user.id}`, {
+        put(`/admin/users/${user.id}`, {
             onSuccess: () => {
                 setIsEditing(false);
             },
@@ -94,7 +94,7 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
                                             Edit Profile
                                         </Button>
                                         <DeleteConfirmation
-                                            onConfirm={() => router.delete(`/users/${user.id}`)}
+                                            onConfirm={() => router.delete(`/admin/users/${user.id}`)}
                                             itemType="user"
                                             itemName={user.name}
                                         >
@@ -153,7 +153,7 @@ export default function UserDetails({ user }: PageProps<{ user: User }>) {
                             {!isEditing && (
                                 <div className="pt-4">
                                     <Button asChild variant="outline" className="w-full sm:w-auto">
-                                        <Link href="/users">Back to User List</Link>
+                                        <Link href="/admin/users">Back to User List</Link>
                                     </Button>
                                 </div>
                             )}

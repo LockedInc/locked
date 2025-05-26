@@ -24,7 +24,7 @@ import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Meetings',
-        href: '/meetings',
+        href: '/admin/meetings',
     },
     {
         title: 'Meeting Details',
@@ -60,7 +60,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/meetings/${meeting.id}`, {
+        put(`/admin/meetings/${meeting.id}`, {
             onSuccess: () => {
                 setIsEditing(false);
             }
@@ -73,7 +73,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
 
     const handleDelete = () => {
         if (confirm("Are you sure you want to delete this meeting?")) {
-            router.delete(`/meetings/${meeting.id}`);
+            router.delete(`/admin/meetings/${meeting.id}`);
         }
     };
 
@@ -106,7 +106,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                 </Button>
                                 
                                 <DeleteConfirmation
-                                    onConfirm={() => router.delete(`/meetings/${meeting.id}`)}
+                                    onConfirm={() => router.delete(`/admin/meetings/${meeting.id}`)}
                                     itemType="meeting"
                                     itemName={meeting.title}
                                 >
@@ -169,19 +169,11 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                 value={data.date}
                                                 onChange={e => {
                                                     const date = new Date(e.target.value);
-                                                    // Set seconds to 0
-                                                    date.setSeconds(0);
                                                     setData('date', format(date, "yyyy-MM-dd'T'HH:mm"));
                                                 }}
                                                 error={errors.date}
                                                 className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full pl-10"
                                                 step="60"
-                                                onFocus={(e) => {
-                                                    // Remove seconds from the input when focused
-                                                    const date = new Date(e.target.value);
-                                                    date.setSeconds(0);
-                                                    e.target.value = format(date, "yyyy-MM-dd'T'HH:mm");
-                                                }}
                                             />
                                             <Calendar className="h-4 w-4 absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                                         </div>
@@ -373,7 +365,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                     </div>
                 </div>
                 <div className="mt-6">
-                    <Button variant="outline" onClick={() => router.visit('/meetings')} className="cursor-pointer">
+                    <Button variant="outline" onClick={() => router.visit('/admin/meetings')} className="cursor-pointer">
                         ← Back to Meetings List
                     </Button>
                 </div>

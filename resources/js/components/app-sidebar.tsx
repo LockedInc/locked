@@ -9,23 +9,23 @@ import AppLogo from './app-logo';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: '/admin/dashboard',
         icon: LayoutGrid,
     },
     {
         title: 'Tasks',
-        href: '/tasks',
+        href: '/admin/tasks',
         icon: SquareCheckBig,
     },
     {
         title: 'Users',
-        href: '/users',
+        href: '/admin/users',
         icon: Users,
     },
 
     {
         title: 'Meetings',
-        href: '/meetings',
+        href: '/admin/meetings',
         icon: Calendar,
     },
 ];
