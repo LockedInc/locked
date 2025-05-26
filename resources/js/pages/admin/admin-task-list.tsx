@@ -4,15 +4,30 @@ import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, ArrowUpDown } from 'lucide-react';
+import { Plus, ArrowUpDown, Filter, Calendar, User } from 'lucide-react';
 import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
-import { format } from 'date-fns';
-import { Task, TaskStatus, User } from '@/types/task';
+import { format, addDays, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
+import { Task, TaskStatus, User as TaskUser } from '@/types/task';
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
 import { AdminTaskStats } from '@/components/tasks/admin-task-stats';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuGroup,
+} from "@/components/ui/dropdown-menu";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,7 +38,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface PageProps {
     tasks: Task[];
-    users: User[];
+    users: TaskUser[];
 }
 
 const columns: ColumnDef<Task>[] = [
@@ -134,12 +149,88 @@ const columns: ColumnDef<Task>[] = [
 
 export default function Tasks({ tasks, users }: PageProps) {
     const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<string>('all');
-    const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [filteredTasks, setFilteredTasks] = useState(tasks);
+    const [selectedUser, setSelectedUser] = useState<string | null>(null);
+    const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null);
 
-    const filteredTasks = tasks
-        .filter(task => selectedStatus === 'all' || task.status === selectedStatus)
-        .filter(task => selectedUser === 'all' || task.users.some(u => String(u.id) === selectedUser));
+    const clearFilters = () => {
+        setSelectedUser(null);
+        setSelectedDateFilter(null);
+        setFilteredTasks(tasks);
+    };
+
+    const applyFilters = (dateFilter?: string, userFilter?: string) => {
+        let filtered = tasks;
+
+        // Apply date filter
+        if (dateFilter) {
+            const now = new Date();
+            const today = startOfDay(now);
+            const tomorrow = endOfDay(addDays(today, 1));
+            const nextWeek = endOfDay(addDays(today, 7));
+            const nextMonth = endOfDay(addDays(today, 30));
+
+            switch (dateFilter) {
+                case 'due-today':
+                    filtered = filtered.filter(task => {
+                        if (!task.due_date) return false;
+                        const dueDate = new Date(task.due_date);
+                        return isAfter(dueDate, today) && isBefore(dueDate, tomorrow);
+                    });
+                    break;
+                case 'due-tomorrow':
+                    filtered = filtered.filter(task => {
+                        if (!task.due_date) return false;
+                        const dueDate = new Date(task.due_date);
+                        return isAfter(dueDate, tomorrow) && isBefore(dueDate, addDays(tomorrow, 1));
+                    });
+                    break;
+                case 'due-this-week':
+                    filtered = filtered.filter(task => {
+                        if (!task.due_date) return false;
+                        const dueDate = new Date(task.due_date);
+                        return isAfter(dueDate, today) && isBefore(dueDate, nextWeek);
+                    });
+                    break;
+                case 'due-this-month':
+                    filtered = filtered.filter(task => {
+                        if (!task.due_date) return false;
+                        const dueDate = new Date(task.due_date);
+                        return isAfter(dueDate, today) && isBefore(dueDate, nextMonth);
+                    });
+                    break;
+                case 'overdue':
+                    filtered = filtered.filter(task => {
+                        if (!task.due_date) return false;
+                        const dueDate = new Date(task.due_date);
+                        return isBefore(dueDate, today);
+                    });
+                    break;
+                case 'no-due-date':
+                    filtered = filtered.filter(task => !task.due_date);
+                    break;
+            }
+        }
+
+        // Apply user filter
+        if (userFilter) {
+            filtered = filtered.filter(task => 
+                task.users.some(user => String(user.id) === userFilter)
+            );
+        }
+
+        setFilteredTasks(filtered);
+    };
+
+    const handleDateFilter = (filterType: string) => {
+        setSelectedDateFilter(filterType === 'all' ? null : filterType);
+        applyFilters(filterType === 'all' ? undefined : filterType, selectedUser || undefined);
+    };
+
+    const handleUserFilter = (userId: string) => {
+        setSelectedUser(userId === 'all' ? null : userId);
+        applyFilters(selectedDateFilter || undefined, userId === 'all' ? undefined : userId);
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -152,33 +243,8 @@ export default function Tasks({ tasks, users }: PageProps) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4 px-6 mb-4 ">
-                    <Select value={selectedStatus} onValueChange={setSelectedStatus} >
-                        <SelectTrigger className="w-[200px] cursor-pointer">
-                            <SelectValue placeholder="Filter by status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all" className="cursor-pointer">All Statuses</SelectItem>
-                            <SelectItem value="pending" className="cursor-pointer hover:bg-muted/50">Pending</SelectItem>
-                            <SelectItem value="in_progress" className="cursor-pointer hover:bg-muted/50">In Progress</SelectItem>
-                            <SelectItem value="completed" className="cursor-pointer hover:bg-muted/50">Completed</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Select value={selectedUser} onValueChange={setSelectedUser}>
-                        <SelectTrigger className="w-[200px] cursor-pointer">
-                            <SelectValue placeholder="Filter by user" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all" className="cursor-pointer">All Users</SelectItem>
-                            {users.map(user => (
-                                <SelectItem key={user.id} value={String(user.id)} className="cursor-pointer hover:bg-muted/50">{user.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
                 <Card>
-                    <CardContent className="pt-6 ">
+                    <CardContent className="pt-6">
                         <DataTable
                             columns={columns}
                             data={filteredTasks}
@@ -186,10 +252,104 @@ export default function Tasks({ tasks, users }: PageProps) {
                             searchColumn="name"
                             onRowClick={(task) => router.visit(`/tasks/${task.id}`)}
                             addButton={
-                                <Button onClick={() => setIsTaskDialogOpen(true)} className="cursor-pointer">
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Add Task
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="sm" className="h-8 gap-1">
+                                                <Filter className="h-4 w-4" />
+                                                Filter
+                                                {(selectedUser || selectedDateFilter) && (
+                                                    <Badge variant="secondary" className="ml-1">
+                                                        {[selectedUser, selectedDateFilter].filter(Boolean).length}
+                                                    </Badge>
+                                                )}
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-[200px]">
+                                            {(selectedUser || selectedDateFilter) && (
+                                                <>
+                                                    <DropdownMenuItem onClick={clearFilters}>
+                                                        Clear All Filters
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                </>
+                                            )}
+                                            <DropdownMenuGroup>
+                                                <DropdownMenuLabel>Filter by Due Date</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDateFilter('all')}
+                                                    className={selectedDateFilter === null ? 'bg-muted' : ''}
+                                                >
+                                                    All Tasks
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDateFilter('due-today')}
+                                                    className={selectedDateFilter === 'due-today' ? 'bg-muted' : ''}
+                                                >
+                                                    Due Today
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDateFilter('due-tomorrow')}
+                                                    className={selectedDateFilter === 'due-tomorrow' ? 'bg-muted' : ''}
+                                                >
+                                                    Due Tomorrow
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDateFilter('due-this-week')}
+                                                    className={selectedDateFilter === 'due-this-week' ? 'bg-muted' : ''}
+                                                >
+                                                    Due This Week
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDateFilter('due-this-month')}
+                                                    className={selectedDateFilter === 'due-this-month' ? 'bg-muted' : ''}
+                                                >
+                                                    Due This Month
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDateFilter('overdue')}
+                                                    className={selectedDateFilter === 'overdue' ? 'bg-muted' : ''}
+                                                >
+                                                    Overdue
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDateFilter('no-due-date')}
+                                                    className={selectedDateFilter === 'no-due-date' ? 'bg-muted' : ''}
+                                                >
+                                                    No Due Date
+                                                </DropdownMenuItem>
+                                            </DropdownMenuGroup>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuGroup>
+                                                <DropdownMenuLabel>Filter by Assignee</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <div className="px-2 py-1">
+                                                    <Select
+                                                        value={selectedUser || 'all'}
+                                                        onValueChange={handleUserFilter}
+                                                    >
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select user..." />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="all">All Users</SelectItem>
+                                                            {users.map((user) => (
+                                                                <SelectItem key={user.id} value={String(user.id)}>
+                                                                    {user.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </DropdownMenuGroup>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    <Button onClick={() => setIsTaskDialogOpen(true)} className="cursor-pointer">
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add Task
+                                    </Button>
+                                </div>
                             }
                         />
                     </CardContent>
