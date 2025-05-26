@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
 
 interface UserData {
     id: number;
@@ -46,15 +48,16 @@ export default function UserDetails({ user }: PageProps) {
         ]),
         {
             title: user.name,
-            href: '#',
+            href: `/users/${user.id}`,
         },
     ];
 
-    const handleSave = () => {
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
         put(`/users/${user.id}`, {
             onSuccess: () => {
                 setIsEditing(false);
-            },
+            }
         });
     };
 
@@ -76,17 +79,65 @@ export default function UserDetails({ user }: PageProps) {
                                 </div>
                                 <CardTitle className="text-2xl font-semibold">{data.name}</CardTitle>
                             </div>
+                            <div className="flex gap-2">
+                                {isEditing ? (
+                                    <>
+                                        <Button variant="outline" onClick={handleCancel} className="cursor-pointer">
+                                            Cancel
+                                        </Button>
+                                        <Button onClick={handleSubmit} disabled={processing} className="cursor-pointer">
+                                            Save Changes
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button onClick={() => setIsEditing(true)} className="cursor-pointer">
+                                            Edit User
+                                        </Button>
+                                        <DeleteConfirmation
+                                            onConfirm={() => router.delete(`/users/${user.id}`)}
+                                            itemType="user"
+                                            itemName={user.name}
+                                        >
+                                            <Button variant="destructive" className="cursor-pointer">
+                                                Delete User
+                                            </Button>
+                                        </DeleteConfirmation>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-6">
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
-                                <p className="text-lg">{data.name}</p>
+                                {isEditing ? (
+                                    <Input
+                                        id="name"
+                                        value={data.name}
+                                        onChange={e => setData('name', e.target.value)}
+                                        error={errors.name}
+                                        className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
+                                    />
+                                ) : (
+                                    <p className="text-lg">{data.name}</p>
+                                )}
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
-                                <p className="text-lg">{data.email}</p>
+                                {isEditing ? (
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={data.email}
+                                        onChange={e => setData('email', e.target.value)}
+                                        error={errors.email}
+                                        className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
+                                    />
+                                ) : (
+                                    <p className="text-lg">{data.email}</p>
+                                )}
                             </div>
                             <div className="mt-6">
                                 {fromMeetingId ? (
