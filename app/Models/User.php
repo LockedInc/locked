@@ -53,12 +53,12 @@ class User extends Authenticatable
 
     public function meetings(): BelongsToMany
     {
-        return $this->belongsToMany(Meeting::class);
+        return $this->belongsToMany(Meeting::class)->withTimestamps();
     }
 
     public function tasks(): BelongsToMany
     {
-        return $this->belongsToMany(Task::class);
+        return $this->belongsToMany(Task::class)->withTimestamps();
     }
 
     public function client(): BelongsTo

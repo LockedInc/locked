@@ -19,16 +19,18 @@ interface CreateTaskDialogProps {
     users: User[];
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    meetingId?: number;
 }
 
-export function CreateTaskDialog({ users, open, onOpenChange }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ users, open, onOpenChange, meetingId }: CreateTaskDialogProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         description: '',
         status: 'pending' as TaskStatus,
         priority: 'medium' as TaskPriority,
         due_date: '',
-        users: [] as number[]
+        users: [] as number[],
+        meeting_id: meetingId
     });
 
     const handleSubmit = (e: React.FormEvent) => {

@@ -32,11 +32,11 @@ class Meeting extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->withTimestamps();
     }   
 
     public function tasks(): BelongsToMany
     {
-        return $this->belongsToMany(Task::class);
+        return $this->belongsToMany(Task::class)->withTimestamps();
     }
 }

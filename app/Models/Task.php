@@ -27,11 +27,11 @@ class Task extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-    public function meetings()
+    public function meetings(): BelongsToMany
     {
-        return $this->belongsToMany(Meeting::class);
+        return $this->belongsToMany(Meeting::class)->withTimestamps();
     }
 }

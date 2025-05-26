@@ -277,7 +277,12 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                             <div className="flex flex-wrap gap-1">
                                                 {task.users.length > 0 ? (
                                                     task.users.map((user) => (
-                                                        <Badge key={user.id} variant="secondary" className="text-sm">
+                                                        <Badge 
+                                                            key={user.id} 
+                                                            variant="secondary" 
+                                                            className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
+                                                            onClick={() => router.visit(`/users/${user.id}`)}
+                                                        >
                                                             {user.name}
                                                         </Badge>
                                                     ))

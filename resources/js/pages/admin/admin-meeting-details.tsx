@@ -14,11 +14,12 @@ import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { useForm } from '@inertiajs/react';
-import { Check, ChevronsUpDown, Trash2, Calendar, Users, ListTodo } from "lucide-react"
+import { Check, ChevronsUpDown, Trash2, Calendar, Users, ListTodo, Plus } from "lucide-react"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
+import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,6 +48,7 @@ const typeColors: Record<MeetingType, string> = {
 
 export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
     const { data, setData, put, processing, errors } = useForm({
         title: meeting.title,
         date: meeting.date,
@@ -260,7 +262,12 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                         <div className="flex flex-wrap gap-1.5">
                                             {meeting.users.length > 0 ? (
                                                 meeting.users.map((user) => (
-                                                    <Badge key={user.id} variant="secondary" className="text-sm bg-muted/50">
+                                                    <Badge 
+                                                        key={user.id} 
+                                                        variant="secondary" 
+                                                        className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
+                                                        onClick={() => router.visit(`/users/${user.id}`)}
+                                                    >
                                                         {user.name}
                                                     </Badge>
                                                 ))
@@ -275,7 +282,16 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
 
                         <Card className="shadow-sm">
                             <CardHeader className="pb-4">
-                                <CardTitle className="text-lg font-medium">Related Tasks</CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-lg font-medium">Related Tasks</CardTitle>
+                                    <Button 
+                                        onClick={() => setIsCreateTaskOpen(true)} 
+                                        className="cursor-pointer"
+                                    >
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add Task
+                                    </Button>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 {isEditing ? (
@@ -332,7 +348,11 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                         <div className="flex flex-wrap gap-1.5">
                                             {meeting.tasks.length > 0 ? (
                                                 meeting.tasks.map((task) => (
-                                                    <Badge key={task.id} variant="secondary" className="text-sm bg-muted/50">
+                                                    <Badge key={task.id} 
+                                                        variant="secondary" 
+                                                        className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors" 
+                                                        onClick={() => router.visit(`/tasks/${task.id}`)}
+                                                    >
                                                         {task.name}
                                                     </Badge>
                                                 ))
@@ -352,6 +372,12 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                     </Button>
                 </div>
             </div>
+            <CreateTaskDialog 
+                open={isCreateTaskOpen}
+                onOpenChange={setIsCreateTaskOpen}
+                users={users}
+                meetingId={meeting.id}
+            />
         </AppLayout>
     );
 }

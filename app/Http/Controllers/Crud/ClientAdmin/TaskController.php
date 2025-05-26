@@ -40,7 +40,8 @@ class TaskController extends Controller
             'priority' => 'required|in:low,medium,high',
             'due_date' => 'nullable|date',
             'users' => 'array',
-            'users.*' => 'exists:users,id'
+            'users.*' => 'exists:users,id',
+            'meeting_id' => 'nullable|exists:meetings,id'
         ]);
 
         $task = Task::create([
@@ -51,10 +52,15 @@ class TaskController extends Controller
             'due_date' => $request->due_date,
             'client_id' => auth()->user()->client->id
         ]);
-
+        
         if ($request->has('users')) {
-            $task->users()->attach($request->users);
+            $task->users()->sync($request->users);
         }
+
+        if ($request->has('meeting_id')) {
+            $task->meetings()->sync([$request->meeting_id]);
+        }
+
         session()->flash('success', 'Task created successfully!');
         return back();
     }   
