@@ -14,10 +14,9 @@ import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { useForm, usePage } from '@inertiajs/react';
 import { Check, ChevronsUpDown, Trash2, Calendar, Users, AlertCircle } from "lucide-react"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
+import { MultiSelect } from "@/components/ui/multi-select"
 
 interface PageProps {
     task: Task;
@@ -77,28 +76,47 @@ export default function TaskDetails({ task, all_users }: PageProps) {
         put(`/tasks/${task.id}`, {
             onSuccess: () => {
                 setIsEditing(false);
-            }
+            },
+            preserveScroll: true
         });
     };
 
     const handleCancel = () => {
         setIsEditing(false);
+        setData({
+            name: task.name,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            due_date: task.due_date,
+            users: task.users.map(user => user.id)
+        });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Task: ${task.name}`} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-semibold">Task Details</h1>
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-semibold tracking-tight">{task.name}</h1>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Calendar className="h-4 w-4" />
+                            {task.due_date ? format(new Date(task.due_date), 'MMMM d, yyyy') : 'No due date'}
+                        </div>
+                    </div>
                     <div className="flex gap-2">
                         {isEditing ? (
                             <>
                                 <Button variant="outline" onClick={handleCancel} className="cursor-pointer">
                                     Cancel
                                 </Button>
-                                <Button onClick={handleSubmit} disabled={processing} className="cursor-pointer">
-                                    Save Changes
+                                <Button 
+                                    onClick={handleSubmit} 
+                                    disabled={processing} 
+                                    className="cursor-pointer"
+                                >
+                                    {processing ? 'Saving...' : 'Save Changes'}
                                 </Button>
                             </>
                         ) : (
@@ -120,195 +138,161 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                     </div>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Task Information</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Task Name</Label>
-                                {isEditing ? (
-                                    <Input
-                                        id="name"
-                                        value={data.name}
-                                        onChange={e => setData('name', e.target.value)}
-                                        error={errors.name}
-                                        className="h-10"
-                                    />
-                                ) : (
-                                    <div className="text-lg font-medium mt-2 h-10 flex items-center">{task.name}</div>
-                                )}
-                            </div>
+                <div className="grid grid-cols-3 gap-6">
+                    <Card className="col-span-3 shadow-sm">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-lg font-medium">Task Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleSubmit} className="space-y-8">
+                                <div className="grid grid-cols-2 gap-8">
+                                    <div className="space-y-8">
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="name" className="text-sm font-medium">Task Name</Label>
+                                            {isEditing ? (
+                                                <Input
+                                                    id="name"
+                                                    value={data.name}
+                                                    onChange={e => setData('name', e.target.value)}
+                                                    error={errors.name}
+                                                    className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
+                                                />
+                                            ) : (
+                                                <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full">
+                                                    {task.name}
+                                                </div>
+                                            )}
+                                        </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="description">Description</Label>
-                                {isEditing ? (
-                                    <Textarea
-                                        id="description"
-                                        value={data.description}
-                                        onChange={e => setData('description', e.target.value)}
-                                        error={errors.description}
-                                        className="min-h-[100px]"
-                                    />
-                                ) : (
-                                    <div className="text-muted-foreground bg-muted/50 p-3 rounded-md mt-2 min-h-[100px]">
-                                        {task.description}
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                                            {isEditing ? (
+                                                <Textarea
+                                                    id="description"
+                                                    value={data.description}
+                                                    onChange={e => setData('description', e.target.value)}
+                                                    error={errors.description}
+                                                    className="min-h-[120px] text-sm bg-muted/30 p-4 rounded-md border w-full"
+                                                />
+                                            ) : (
+                                                <div className="min-h-[120px] text-sm bg-muted/30 p-4 rounded-md border w-full whitespace-pre-wrap">
+                                                    {task.description || 'No description provided'}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2 w-full">
+                                            {isEditing ? (
+                                                <MultiSelect
+                                                    items={all_users}
+                                                    selectedIds={data.users}
+                                                    onSelectionChange={(ids) => setData('users', ids)}
+                                                    placeholder="Select users..."
+                                                    label="Assigned Users"
+                                                    error={errors.users}
+                                                />
+                                            ) : (
+                                                <div className="space-y-4">
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {task.users.length > 0 ? (
+                                                            task.users.map((user) => (
+                                                                <Badge 
+                                                                    key={user.id} 
+                                                                    variant="secondary" 
+                                                                    className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
+                                                                    onClick={() => router.visit(`/users/${user.id}?from_task=${task.id}`)}
+                                                                >
+                                                                    {user.name}
+                                                                </Badge>
+                                                            ))
+                                                        ) : (
+                                                            <span className="text-muted-foreground text-sm">No users assigned</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="status">Status</Label>
-                                    {isEditing ? (
-                                        <Select
-                                            value={data.status}
-                                            onValueChange={(value) => {
-                                                setData('status', value as TaskStatus);
-                                            }}
-                                        >
-                                            <SelectTrigger className="h-10">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="pending">Pending</SelectItem>
-                                                <SelectItem value="in_progress">In Progress</SelectItem>
-                                                <SelectItem value="completed">Completed</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    ) : (
-                                        <div className="mt-2 h-10 flex items-center">
-                                            <Badge className={cn(statusColors[task.status], "text-sm font-medium px-3 py-1")}>
-                                                {task.status.replace('_', ' ')}
-                                            </Badge>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="priority">Priority</Label>
-                                    {isEditing ? (
-                                        <Select
-                                            value={data.priority}
-                                            onValueChange={(value) => {
-                                                setData('priority', value as TaskPriority);
-                                            }}
-                                        >
-                                            <SelectTrigger className="h-10">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="low">Low</SelectItem>
-                                                <SelectItem value="medium">Medium</SelectItem>
-                                                <SelectItem value="high">High</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    ) : (
-                                        <div className="mt-2 h-10 flex items-center">
-                                            <Badge className={cn(priorityColors[task.priority], "text-sm font-medium px-3 py-1")}>
-                                                {task.priority}
-                                            </Badge>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label>Due Date</Label>
-                                    {isEditing ? (
-                                        <Input
-                                            type="date"
-                                            value={data.due_date ? new Date(data.due_date).toISOString().split('T')[0] : ''}
-                                            onChange={e => setData('due_date', e.target.value)}
-                                            error={errors.due_date}
-                                            className="h-10"
-                                        />
-                                    ) : (
-                                        <div className="flex items-center text-muted-foreground mt-2 h-10">
-                                            <Calendar className="h-4 w-4 mr-2" />
-                                            {task.due_date ? format(new Date(task.due_date), 'MMM dd, yyyy') : 'No due date'}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label>Assigned Users</Label>
-                                    {isEditing ? (
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    className="w-full justify-between h-10"
+                                    <div className="space-y-8">
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="status" className="text-sm font-medium">Status</Label>
+                                            {isEditing ? (
+                                                <Select
+                                                    value={data.status}
+                                                    onValueChange={(value) => {
+                                                        setData('status', value as TaskStatus);
+                                                    }}
                                                 >
-                                                    {data.users.length > 0
-                                                        ? `${data.users.length} users selected`
-                                                        : "Select users..."}
-                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-full p-0" align="start">
-                                                <Command className="max-h-[200px]">
-                                                    <CommandInput placeholder="Search users..." />
-                                                    <CommandEmpty>No users found.</CommandEmpty>
-                                                    <CommandGroup className="overflow-y-auto">
-                                                        {all_users.map((user) => (
-                                                            <CommandItem
-                                                                key={user.id}
-                                                                onSelect={() => {
-                                                                    const newUsers = data.users.includes(user.id)
-                                                                        ? data.users.filter(id => id !== user.id)
-                                                                        : [...data.users, user.id];
-                                                                    setData('users', newUsers);
-                                                                }}
-                                                                className="flex items-center gap-2 px-2 py-1.5"
-                                                            >
-                                                                <Check
-                                                                    className={cn(
-                                                                        "h-4 w-4",
-                                                                        data.users.includes(user.id) ? "opacity-100" : "opacity-0"
-                                                                    )}
-                                                                />
-                                                                <span>{user.name}</span>
-                                                            </CommandItem>
-                                                        ))}
-                                                    </CommandGroup>
-                                                </Command>
-                                            </PopoverContent>
-                                        </Popover>
-                                    ) : (
-                                        <div className="space-y-2 mt-2 min-h-[40px]">
-                                            <div className="flex items-center text-muted-foreground">
-                                                <Users className="h-4 w-4 mr-2" />
-                                                {task.users.length > 0 
-                                                    ? `${task.users.length} ${task.users.length === 1 ? 'User' : 'Users'} Assigned`
-                                                    : 'No Users Assigned'}
-                                            </div>
-                                            <div className="flex flex-wrap gap-1">
-                                                {task.users.length > 0 ? (
-                                                    task.users.map((user) => (
-                                                        <Badge 
-                                                            key={user.id} 
-                                                            variant="secondary" 
-                                                            className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
-                                                            onClick={() => router.visit(`/users/${user.id}?from_meeting=${fromMeetingId}`)}
-                                                        >
-                                                            {user.name}
-                                                        </Badge>
-                                                    ))
-                                                ) : (
-                                                    <span className="text-muted-foreground text-sm">None</span>
-                                                )}
-                                            </div>
+                                                    <SelectTrigger className="h-10 text-sm bg-muted/30">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="pending">Pending</SelectItem>
+                                                        <SelectItem value="in_progress">In Progress</SelectItem>
+                                                        <SelectItem value="completed">Completed</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            ) : (
+                                                <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full">
+                                                    {task.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
+
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="priority" className="text-sm font-medium">Priority</Label>
+                                            {isEditing ? (
+                                                <Select
+                                                    value={data.priority}
+                                                    onValueChange={(value) => {
+                                                        setData('priority', value as TaskPriority);
+                                                    }}
+                                                >
+                                                    <SelectTrigger className="h-10 text-sm bg-muted/30">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="low">Low</SelectItem>
+                                                        <SelectItem value="medium">Medium</SelectItem>
+                                                        <SelectItem value="high">High</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            ) : (
+                                                <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center border w-full">
+                                                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-2 w-full">
+                                            <Label htmlFor="due_date" className="text-sm font-medium">Due Date</Label>
+                                            {isEditing ? (
+                                                <div className="relative">
+                                                    <Input
+                                                        type="date"
+                                                        id="due_date"
+                                                        value={data.due_date ? new Date(data.due_date).toISOString().split('T')[0] : ''}
+                                                        onChange={e => setData('due_date', e.target.value)}
+                                                        error={errors.due_date}
+                                                        className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full pl-10"
+                                                    />
+                                                    <Calendar className="h-4 w-4 absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                                                </div>
+                                            ) : (
+                                                <div className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-muted-foreground border w-full">
+                                                    <Calendar className="h-4 w-4 mr-2" />
+                                                    {task.due_date ? format(new Date(task.due_date), 'MMMM d, yyyy') : 'No due date'}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </div>
+
                 <div className="mt-6">
                     {fromMeetingId ? (
                         <Button variant="outline" onClick={() => router.visit(`/meetings/${fromMeetingId}`)} className="cursor-pointer">
