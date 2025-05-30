@@ -14,7 +14,7 @@ import { Meeting } from '@/types/meeting';
 import { Task, User } from '@/types/task';
 import { CreateMeetingDialog } from '@/components/meetings/create-meeting-dialog';
 import { MeetingSummary } from '@/components/meetings/meeting-summary';
-
+import { useRolePrefix } from '@/hooks/use-role-prefix';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Meetings',
@@ -168,6 +168,7 @@ const columns: ColumnDef<Meeting>[] = [
 
 export default function Meetings({ meetings, users, tasks }: PageProps) {
     const [isMeetingDialogOpen, setIsMeetingDialogOpen] = useState(false);
+    const { getRoute } = useRolePrefix();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -187,7 +188,7 @@ export default function Meetings({ meetings, users, tasks }: PageProps) {
                             data={meetings}
                             searchPlaceholder="Search meetings..."
                             searchColumn="title"
-                            onRowClick={(meeting) => router.visit(`/meetings/${meeting.id}`)}
+                            onRowClick={(meeting) => router.visit(getRoute(`/meetings/${meeting.id}`))} 
                             addButton={
                                 <Button onClick={() => setIsMeetingDialogOpen(true)} className="cursor-pointer">
                                     <Plus className="mr-2 h-4 w-4" />

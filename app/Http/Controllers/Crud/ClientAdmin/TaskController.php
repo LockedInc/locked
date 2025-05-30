@@ -7,7 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
+use App\Services\TimelineMessageService;
 class TaskController extends Controller
 {
     public function index()
@@ -61,6 +61,9 @@ class TaskController extends Controller
             $task->meetings()->sync([$request->meeting_id]);
         }
 
+        $timelineMessageService = new TimelineMessageService();
+        $timelineMessageService->taskCreated(auth()->user(), $task->name, 'Task', $task->id);
+
         session()->flash('success', 'Task created successfully!');
         return back();
     }   
@@ -96,7 +99,7 @@ class TaskController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'status' => 'required|in:pending,in_progress,completed',
@@ -106,11 +109,17 @@ class TaskController extends Controller
             'users.*' => 'exists:users,id'
         ]);
 
+        $originalValues = $task->getOriginal();
+
+
         $task->update($request->only(['name', 'description', 'status', 'priority', 'due_date']));
 
         if ($request->has('users')) {
             $task->users()->sync($request->users);
         }
+
+        $timelineMessageService = new TimelineMessageService();
+        $timelineMessageService->taskUpdated(auth()->user(), $task->name, 'Task', $task->id , $originalValues, $validatedData);
 
         session()->flash('success', 'Task updated successfully!');
         return back();

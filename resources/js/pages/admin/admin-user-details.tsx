@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
+import { useRolePrefix } from '@/hooks/use-role-prefix';
 
 interface UserData {
     id: number;
@@ -23,6 +24,7 @@ interface PageProps {
 
 export default function UserDetails({ user }: PageProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const { getRoute } = useRolePrefix();
     const { data, setData, put, processing, errors, reset } = useForm({
         name: user.name,
         email: user.email,
@@ -54,7 +56,7 @@ export default function UserDetails({ user }: PageProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/users/${user.id}`, {
+        put(getRoute(`/users/${user.id}`), {
             onSuccess: () => {
                 setIsEditing(false);
             }
@@ -141,11 +143,11 @@ export default function UserDetails({ user }: PageProps) {
                             </div>
                             <div className="mt-6">
                                 {fromMeetingId ? (
-                                    <Button variant="outline" onClick={() => router.visit(`/meetings/${fromMeetingId}`)} className="cursor-pointer">
+                                    <Button variant="outline" onClick={() => router.visit(getRoute(`/meetings/${fromMeetingId}`))} className="cursor-pointer">
                                         ← Back to Meeting
                                     </Button>
                                 ) : (
-                                    <Button variant="outline" onClick={() => router.visit('/users')} className="cursor-pointer">
+                                    <Button variant="outline" onClick={() => router.visit(getRoute('/users'))} className="cursor-pointer">
                                         ← Back to Users List
                                     </Button>
                                 )}

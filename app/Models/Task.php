@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Task extends Model
 {
@@ -33,5 +34,10 @@ class Task extends Model
     public function meetings(): BelongsToMany
     {
         return $this->belongsToMany(Meeting::class)->withTimestamps();
+    }
+
+    public function timelines(): MorphMany
+    {
+        return $this->morphMany(Timeline::class, 'subject');
     }
 }

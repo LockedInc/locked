@@ -5,10 +5,12 @@ import { Head } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TaskProgress } from '@/components/tasks/task-progress';
 import { Task, User } from '@/types/task';
+import { Timeline } from '@/types/timeline';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { TaskStatusPieChart } from '@/components/dashboard/task-stats-pie';
 import { UserWorkloadChart } from '@/components/dashboard/user-workload-chart';
+import { RecentActivity } from '@/components/dashboard/admin-recent-activity';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,17 +29,17 @@ interface DashboardProps {
     upcomingTasks: Task[];
     users: User[];
     tasks: Task[];
+    recentActivities: Timeline[];
 }
 
-export default function Dashboard({ taskStats, upcomingTasks, users, tasks }: DashboardProps) {
+export default function Dashboard({ taskStats, upcomingTasks, users, tasks, recentActivities }: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
+            <div className="flex h-[calc(100vh)] flex-1 flex-col gap-2 pt-2 px-4 pb-4">
+                <h1 className="text-2xl font-semibold">Dashboard</h1>
                 <div
-                    className="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-4 h-full"
-                    style={{ minHeight: '70vh' }}
+                    className="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-4 h-[calc(100%)]"
                 >
                     {/* Recent Activity (left, spans 2 rows) */}
                     <Card className="row-span-2 md:col-span-1">
@@ -45,9 +47,10 @@ export default function Dashboard({ taskStats, upcomingTasks, users, tasks }: Da
                             <CardTitle>Recent Activity</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {/* Add your recent activity component or content here */}
+                            <RecentActivity activities={recentActivities} />
                         </CardContent>
                     </Card>
+
                     <Card>
                         <CardHeader>
                             <CardTitle>Task Completion</CardTitle>

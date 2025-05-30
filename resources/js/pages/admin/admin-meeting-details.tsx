@@ -20,6 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
+import { useRolePrefix } from '@/hooks/use-role-prefix';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,6 +48,7 @@ const typeColors: Record<MeetingType, string> = {
 };
 
 export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
+    const { getRoute } = useRolePrefix();
     const [isEditing, setIsEditing] = useState(false);
     const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
     const { data, setData, put, processing, errors } = useForm({
@@ -71,7 +73,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/meetings/${meeting.id}`, {
+        put(getRoute(`/meetings/${meeting.id}`), {
             onSuccess: () => {
                 setIsEditing(false);
             }
@@ -84,7 +86,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
 
     const handleDelete = () => {
         if (confirm("Are you sure you want to delete this meeting?")) {
-            router.delete(`/meetings/${meeting.id}`);
+            router.delete(getRoute(`/meetings/${meeting.id}`));
         }
     };
 
@@ -117,7 +119,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                 </Button>
                                 
                                 <DeleteConfirmation
-                                    onConfirm={() => router.delete(`/meetings/${meeting.id}`)}
+                                    onConfirm={() => router.delete(getRoute(`/meetings/${meeting.id}`))}
                                     itemType="meeting"
                                     itemName={meeting.title}
                                 >
@@ -415,7 +417,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                     </Card>
                 </div>
                 <div className="mt-6">
-                    <Button variant="outline" onClick={() => router.visit('/meetings')} className="cursor-pointer">
+                    <Button variant="outline" onClick={() => router.visit(getRoute('/meetings'))} className="cursor-pointer">
                         ← Back to Meetings List
                     </Button>
                 </div>

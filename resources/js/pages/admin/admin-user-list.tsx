@@ -11,6 +11,7 @@ import { PageProps } from '@/types';
 import CreateUserDialog from '@/components/users/create-user-dialog';
 import { UserSummary } from '@/components/users/user-summary';
 import { useState } from 'react';
+import { useRolePrefix } from '@/hooks/use-role-prefix';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -113,6 +114,7 @@ const columns: ColumnDef<User>[] = [
 
 export default function Users({ users }: PageProps<{ users: User[] }>) {
     const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
+    const { getRoute } = useRolePrefix();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -132,7 +134,7 @@ export default function Users({ users }: PageProps<{ users: User[] }>) {
                             data={users}
                             searchPlaceholder="Search users..."
                             searchColumn="name"
-                            onRowClick={(user) => router.visit(`/users/${user.id}`)}
+                            onRowClick={(user) => router.visit(getRoute(`/users/${user.id}`))}
                             addButton={
                                 <Button onClick={() => setIsUserDialogOpen(true)} className="cursor-pointer">
                                     <Plus className="mr-2 h-4 w-4" />

@@ -17,6 +17,7 @@ import { Check, ChevronsUpDown, Trash2, Calendar, Users, AlertCircle } from "luc
 import { cn } from "@/lib/utils"
 import { DeleteConfirmation } from '@/components/ui/delete-confirmation';
 import { MultiSelect } from "@/components/ui/multi-select"
+import { useRolePrefix } from '@/hooks/use-role-prefix';
 
 interface PageProps {
     task: Task;
@@ -37,6 +38,7 @@ const priorityColors = {
 };
 
 export default function TaskDetails({ task, all_users }: PageProps) {
+    const { getRoute } = useRolePrefix();
     const [isEditing, setIsEditing] = useState(false);
     const { data, setData, put, processing, errors } = useForm({
         name: task.name,
@@ -73,7 +75,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/tasks/${task.id}`, {
+        put(getRoute(`/tasks/${task.id}`), {
             onSuccess: () => {
                 setIsEditing(false);
             },
@@ -295,11 +297,11 @@ export default function TaskDetails({ task, all_users }: PageProps) {
 
                 <div className="mt-6">
                     {fromMeetingId ? (
-                        <Button variant="outline" onClick={() => router.visit(`/meetings/${fromMeetingId}`)} className="cursor-pointer">
+                        <Button variant="outline" onClick={() => router.visit(getRoute(`/meetings/${fromMeetingId}`))} className="cursor-pointer">
                             ← Back to Meeting
                         </Button>
                     ) : (
-                        <Button variant="outline" onClick={() => router.visit('/tasks')} className="cursor-pointer">
+                        <Button variant="outline" onClick={() => router.visit(getRoute('/tasks'))} className="cursor-pointer">
                             ← Back to Tasks List
                         </Button>
                     )}

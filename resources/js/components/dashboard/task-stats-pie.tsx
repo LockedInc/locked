@@ -1,5 +1,6 @@
 import { ResponsivePie } from '@nivo/pie';
 import { router } from '@inertiajs/react';
+import { useRolePrefix } from '@/hooks/use-role-prefix';
 
 interface TaskStats {
   completed: number;
@@ -8,6 +9,7 @@ interface TaskStats {
 }
 
 export function TaskStatusPieChart({ taskStats }: { taskStats: TaskStats }) {
+  const { getRoute } = useRolePrefix();
   const pieData = [
     {
       id: 'Completed',
@@ -36,7 +38,7 @@ export function TaskStatusPieChart({ taskStats }: { taskStats: TaskStats }) {
       else if (data.id === 'In Progress') status = 'in_progress';
       else if (data.id === 'Pending') status = 'pending';
       if (status) {
-        router.visit(`/tasks?status=${status}`);
+        router.visit(getRoute(`/tasks?status=${status}`));
       }
     }
   };

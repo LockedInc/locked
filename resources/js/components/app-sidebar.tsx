@@ -1,43 +1,24 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { LayoutGrid, SquareCheckBig, Users, Calendar } from 'lucide-react';
+import { type PageProps, type UserRole } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import AppLogo from './app-logo';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Tasks',
-        href: '/tasks',
-        icon: SquareCheckBig,
-    },
-    {
-        title: 'Users',
-        href: '/users',
-        icon: Users,
-    },
-
-    {
-        title: 'Meetings',
-        href: '/meetings',
-        icon: Calendar,
-    },
-];
+import { getNavigationItems } from '@/config/navigation';
 
 export function AppSidebar() {
+    const props = usePage().props as unknown as PageProps;
+    const userRole = props.auth.user.role?.name as UserRole | undefined;
+    const navItems = getNavigationItems(userRole);
+    const dashboardPath = userRole === 'Client-Admin' ? '/admin/dashboard' : '/member/dashboard';
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href={dashboardPath} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -46,7 +27,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter>

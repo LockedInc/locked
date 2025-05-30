@@ -6,7 +6,7 @@ import { useForm } from "@inertiajs/react"
 import { User, Task } from "@/types/task"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { MultiSelect } from "@/components/ui/multi-select"
-
+import { useRolePrefix } from "@/hooks/use-role-prefix"
 interface CreateMeetingDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
@@ -15,6 +15,7 @@ interface CreateMeetingDialogProps {
 }
 
 export function CreateMeetingDialog({ open, onOpenChange, users, tasks }: CreateMeetingDialogProps) {
+    const { getRoute } = useRolePrefix();
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         date: '',
@@ -26,7 +27,7 @@ export function CreateMeetingDialog({ open, onOpenChange, users, tasks }: Create
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        post('/meetings', {
+        post(getRoute('/meetings'), {
             onSuccess: () => {
                 reset()
                 onOpenChange(false)

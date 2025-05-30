@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Timeline;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -41,18 +42,26 @@ class AdminDashboardController extends Controller
                        now(), 
                        now()->addDays(7)
                    );
-        })->values()->toArray(); // Add values() and toArray()
+        })->values()->toArray();
 
         // Get all users for the timeline
         $users = User::where('client_id', $clientId)
             ->select('id', 'name', 'email')
             ->get();
 
+        // Get recent timeline activities
+        $recentActivities = Timeline::where('origin_client_id', $clientId)
+            ->with(['user:id,name'])
+            ->latest()
+            ->take(10)
+            ->get();
+
         return Inertia::render('admin/admin-dashboard', [
             'taskStats' => $taskStats,
             'upcomingTasks' => $upcomingTasks,
             'users' => $users,
-            'tasks' => $tasks
+            'tasks' => $tasks,
+            'recentActivities' => $recentActivities
         ]);
     }
 }

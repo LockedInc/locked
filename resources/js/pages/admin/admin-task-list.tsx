@@ -1,6 +1,6 @@
 import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type PageProps } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,7 @@ import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
 import { format, addDays, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
-import { Task, TaskStatus, User as TaskUser } from '@/types/task';
+import { type Task, type User as TaskUser, type TaskStatus } from '@/types/task';
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
 import { AdminTaskStats } from '@/components/tasks/admin-task-stats';
 import {
@@ -28,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useRolePrefix } from '@/hooks/use-role-prefix';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -36,7 +37,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface PageProps {
+interface AdminTaskListProps extends PageProps {
     tasks: Task[];
     users: TaskUser[];
 }
@@ -147,7 +148,11 @@ const columns: ColumnDef<Task>[] = [
     },
 ];
 
-export default function Tasks({ tasks, users }: PageProps) {
+export default function AdminTaskList({ tasks, users }: AdminTaskListProps) {
+    const { auth } = usePage().props as unknown as PageProps;
+    const isAdmin = auth.user.role?.name === 'Client-Admin';
+    const { getRoute } = useRolePrefix();
+    const prefix = isAdmin ? '/admin' : '/member';
     const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
     const [filteredTasks, setFilteredTasks] = useState(tasks);
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -250,7 +255,7 @@ export default function Tasks({ tasks, users }: PageProps) {
                             data={filteredTasks}
                             searchPlaceholder="Search tasks..."
                             searchColumn="name"
-                            onRowClick={(task) => router.visit(`/tasks/${task.id}`)}
+                            onRowClick={(task: Task) => router.visit(getRoute(`/tasks/${task.id}`))}
                             addButton={
                                 <div className="flex items-center gap-2">
                                     <DropdownMenu>

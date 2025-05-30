@@ -11,9 +11,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useForm } from "@inertiajs/react"
+import { useForm, usePage } from "@inertiajs/react"
 import { TaskStatus, TaskPriority, User } from "@/types/task"
 import { MultiSelect } from "@/components/ui/multi-select"
+import { type PageProps } from '@/types'
 
 interface CreateTaskDialogProps {
     users: User[];
@@ -33,9 +34,13 @@ export function CreateTaskDialog({ users, open, onOpenChange, meetingId }: Creat
         meeting_id: meetingId
     });
 
+    const { auth } = usePage().props as unknown as PageProps;
+    const isAdmin = auth.user.role?.name === 'Client-Admin';
+    const prefix = isAdmin ? '/admin' : '/member';
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/tasks', {
+        post(`${prefix}/tasks`, {
             onSuccess: () => {
                 reset();
                 onOpenChange(false);
