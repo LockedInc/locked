@@ -7,41 +7,49 @@ use App\Http\Controllers\Crud\ClientAdmin\TaskController as ClientAdminTaskContr
 use App\Http\Controllers\Crud\ClientAdmin\MeetingController as ClientAdminMeetingController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\ClientAdmin\AdminDashboardController;
+use App\Http\Controllers\Member\MemberDashboardController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-        ->name('dashboard');
+    // Client Admin Routes
+    Route::middleware(['role:Client-Admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        
+        // Admin Task Routes
+        Route::get('tasks', [ClientAdminTaskController::class, 'index'])->name('tasks.index');
+        Route::post('tasks', [ClientAdminTaskController::class, 'store'])->name('tasks.store');
+        Route::get('tasks/{task}', [ClientAdminTaskController::class, 'show'])->name('tasks.show');
+        Route::put('tasks/{task}', [ClientAdminTaskController::class, 'update'])->name('tasks.update');
+        Route::delete('tasks/{task}', [ClientAdminTaskController::class, 'destroy'])->name('tasks.destroy');
 
-    // Admin Task Routes
-    Route::middleware(['role:Client-Admin'])->group(function () {
-        Route::get('tasks', [ClientAdminTaskController::class, 'index'])->name('admin.tasks.index');
-        Route::post('tasks', [ClientAdminTaskController::class, 'store'])->name('admin.tasks.store');
-        Route::get('tasks/{task}', [ClientAdminTaskController::class, 'show'])->name('admin.tasks.show');
-        Route::put('tasks/{task}', [ClientAdminTaskController::class, 'update'])->name('admin.tasks.update');
-        Route::delete('tasks/{task}', [ClientAdminTaskController::class, 'destroy'])->name('admin.tasks.destroy');
+        // Admin User Routes
+        Route::get('users', [ClientAdminUserController::class, 'index'])->name('users.index');
+        Route::post('users', [ClientAdminUserController::class, 'store'])->name('users.store');
+        Route::get('users/{user}', [ClientAdminUserController::class, 'show'])->name('users.show');
+        Route::put('users/{user}', [ClientAdminUserController::class, 'update'])->name('users.update');
+        Route::delete('users/{user}', [ClientAdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Admin Meeting Routes
+        Route::get('meetings', [ClientAdminMeetingController::class, 'index'])->name('meetings.index');
+        Route::post('meetings', [ClientAdminMeetingController::class, 'store'])->name('meetings.store');
+        Route::get('meetings/{meeting}', [ClientAdminMeetingController::class, 'show'])->name('meetings.show');
+        Route::put('meetings/{meeting}', [ClientAdminMeetingController::class, 'update'])->name('meetings.update');
+        Route::delete('meetings/{meeting}', [ClientAdminMeetingController::class, 'destroy'])->name('meetings.destroy');
     });
 
-    // Admin User Routes
-    Route::middleware(['role:Client-Admin'])->group(function () {
-        Route::get('users', [ClientAdminUserController::class, 'index'])->name('admin.users.index');
-        Route::post('users', [ClientAdminUserController::class, 'store'])->name('admin.users.store');
-        Route::get('users/{user}', [ClientAdminUserController::class, 'show'])->name('admin.users.show');
-        Route::put('users/{user}', [ClientAdminUserController::class, 'update'])->name('admin.users.update');
-        Route::delete('users/{user}', [ClientAdminUserController::class, 'destroy'])->name('admin.users.destroy');
+    // Member Routes
+    Route::middleware(['role:Member'])->prefix('member')->name('member.')->group(function () {
+        Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
+        // Add member-specific routes here
     });
 
-    // Admin Meeting Routes
-    Route::middleware(['role:Client-Admin'])->group(function () {
-        Route::get('meetings', [ClientAdminMeetingController::class, 'index'])->name('admin.meetings.index');
-        Route::post('meetings', [ClientAdminMeetingController::class, 'store'])->name('admin.meetings.store');
-        Route::get('meetings/{meeting}', [ClientAdminMeetingController::class, 'show'])->name('admin.meetings.show');
-        Route::put('meetings/{meeting}', [ClientAdminMeetingController::class, 'update'])->name('admin.meetings.update');
-        Route::delete('meetings/{meeting}', [ClientAdminMeetingController::class, 'destroy'])->name('admin.meetings.destroy');
-    });
+    // Redirect root dashboard to role-specific dashboard
+    Route::get('/dashboard', function () {
+        return redirect()->route(auth()->user()->role->name === 'Client-Admin' ? 'admin.dashboard' : 'member.dashboard');
+    })->name('dashboard');
 });
 
 require __DIR__.'/settings.php';
