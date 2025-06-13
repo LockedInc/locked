@@ -7,6 +7,8 @@ use App\Http\Controllers\Crud\ClientAdmin\TaskController as ClientAdminTaskContr
 use App\Http\Controllers\Crud\ClientAdmin\MeetingController as ClientAdminMeetingController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\ClientAdmin\AdminDashboardController;
+use App\Http\Controllers\Crud\Member\MemberTaskController;
+use App\Http\Controllers\Crud\Member\MemberMeetingController;
 use App\Http\Controllers\Member\MemberDashboardController;
 
 Route::get('/', function () {
@@ -43,7 +45,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Member Routes
     Route::middleware(['role:Member'])->prefix('member')->name('member.')->group(function () {
         Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
-        // Add member-specific routes here
+        
+        // Member Task Routes
+        Route::get('tasks', [MemberTaskController::class, 'index'])->name('tasks.index');
+        Route::post('tasks', [MemberTaskController::class, 'store'])->name('tasks.store');
+        Route::get('tasks/{task}', [MemberTaskController::class, 'show'])->name('tasks.show');
+        Route::put('tasks/{task}', [MemberTaskController::class, 'update'])->name('tasks.update');
+
+        // Member Meeting Routes
+        Route::get('meetings', [MemberMeetingController::class, 'index'])->name('meetings.index');
+        Route::get('meetings/{meeting}', [MemberMeetingController::class, 'show'])->name('meetings.show');
     });
 
     // Redirect root dashboard to role-specific dashboard

@@ -9,18 +9,19 @@ use App\Models\Task;
 use App\Models\Meeting;
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Timeline;
 
 class MemberDashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        $clientId = $user->client->id;
+        $userId = auth()->id();
+        $clientId = auth()->user()->client->id;
 
-        // Get tasks assigned to this member
+        // Get tasks assigned to the user
         $tasks = Task::where('client_id', $clientId)
-            ->whereHas('users', function ($query) use ($user) {
-                $query->where('users.id', $user->id);
+            ->whereHas('users', function ($query) use ($userId) {
+                $query->where('users.id', $userId);
             })
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
@@ -28,7 +29,7 @@ class MemberDashboardController extends Controller
             }])
             ->get();
 
-        // Get task statistics for this member
+        // Get task completion statistics
         $taskStats = [
             'total' => $tasks->count(),
             'completed' => $tasks->where('status', 'completed')->count(),
@@ -47,8 +48,8 @@ class MemberDashboardController extends Controller
 
         // Get meetings this member is invited to
         $meetings = Meeting::where('client_id', $clientId)
-            ->whereHas('users', function ($query) use ($user) {
-                $query->where('users.id', $user->id);
+            ->whereHas('users', function ($query) use ($userId) {
+                $query->where('users.id', $userId);
             })
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
@@ -56,11 +57,19 @@ class MemberDashboardController extends Controller
             }])
             ->get();
 
+        // Get user's recent timeline activities
+        $recentActivities = Timeline::where('user_id', $userId)
+            ->with(['user:id,name'])
+            ->latest()
+            ->take(10)
+            ->get();
+
         return Inertia::render('member/member-dashboard', [
             'taskStats' => $taskStats,
             'upcomingTasks' => $upcomingTasks,
             'meetings' => $meetings,
-            'tasks' => $tasks
+            'tasks' => $tasks,
+            'recentActivities' => $recentActivities,
         ]);
     }
 } 

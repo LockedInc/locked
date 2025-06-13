@@ -28,8 +28,8 @@ export function UserWorkloadChart({ tasks, users }: UserWorkloadChartProps) {
     const visibleData = sortedData.slice(startIndex, startIndex + usersPerPage);
 
     return (
-        <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="95%">
+        <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="85%">
                 <BarChart
                     data={visibleData}
                     margin={{

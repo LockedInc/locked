@@ -44,6 +44,7 @@ export function CreateTaskDialog({ users, open, onOpenChange, meetingId }: Creat
             onSuccess: () => {
                 reset();
                 onOpenChange(false);
+                window.location.reload();
             }
         });
     };
