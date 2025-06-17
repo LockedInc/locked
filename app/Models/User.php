@@ -8,11 +8,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
+
+    protected $with = ['role'];
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +23,9 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'fname',
+        'mname',
+        'lname',
         'email',
         'password',
         'client_id',
@@ -50,14 +55,22 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get the user's full name.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return trim(implode(' ', array_filter([$this->fname, $this->mname, $this->lname])));
+    }
+
     public function meetings(): BelongsToMany
     {
-        return $this->belongsToMany(Meeting::class);
+        return $this->belongsToMany(Meeting::class)->withTimestamps();
     }
 
     public function tasks(): BelongsToMany
     {
-        return $this->belongsToMany(Task::class);
+        return $this->belongsToMany(Task::class)->withTimestamps();
     }
 
     public function client(): BelongsTo
@@ -69,4 +82,5 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
 }

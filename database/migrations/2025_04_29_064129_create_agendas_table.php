@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('agendas', function (Blueprint $table) {
             $table->id();
-            $table->string('text');
+            $table->text('text');
             $table->softDeletes();
             $table->timestamps();
         });

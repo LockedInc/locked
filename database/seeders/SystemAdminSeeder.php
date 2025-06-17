@@ -15,7 +15,8 @@ class SystemAdminSeeder extends Seeder
 
         $adminUsers = [
             [
-                'name' => 'System Admin',
+                'fname' => 'System',
+                'lname' => 'Admin',
                 'email' => 'systemadmin@lockedinc.com',
                 'role' => 'System-Admin',
             ],
@@ -23,7 +24,8 @@ class SystemAdminSeeder extends Seeder
 
         foreach ($adminUsers as $admin) {
             $userId = DB::table('users')->insertGetId([
-                'name' => $admin['name'],
+                'fname' => $admin['fname'],
+                'lname' => $admin['lname'],
                 'email' => $admin['email'],
                 'role_id' => 1,
                 'password' => Hash::make('password'), 

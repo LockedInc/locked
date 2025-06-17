@@ -46,6 +46,7 @@ interface DataTableProps<TData> {
   searchPlaceholder?: string
   searchColumn?: string
   onRowClick?: (row: TData) => void; // allow for row click to lead to action
+  addButton?: React.ReactNode // optional add button
 }
 
 export function DataTable<TData>({
@@ -54,6 +55,7 @@ export function DataTable<TData>({
   searchPlaceholder = "Filter...",
   searchColumn = "email",
   onRowClick,
+  addButton,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -81,7 +83,7 @@ export function DataTable<TData>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center pt-1 pb-4">
         <Input
           placeholder={searchPlaceholder}
           value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
@@ -90,32 +92,7 @@ export function DataTable<TData>({
           }
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {addButton && <div className="ml-auto">{addButton}</div>}
       </div>
       <div className="rounded-md border">
         <Table>
@@ -180,6 +157,7 @@ export function DataTable<TData>({
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="cursor-pointer"
           >
             Previous
           </Button>
@@ -188,6 +166,7 @@ export function DataTable<TData>({
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            className="cursor-pointer"
           >
             Next
           </Button>

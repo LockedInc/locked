@@ -15,8 +15,10 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::where('client_id', auth()->user()->client_id)->get();
-        return Inertia::render('Users/user-list', [
+        $users = User::where('client_id', auth()->user()->client_id)
+            ->with('role:id,name')
+            ->get();
+        return Inertia::render('admin/admin-user-list', [
             'users' => $users,
             'roles' => Role::all(['id', 'name'])->except(1)//exclude the system admin role
         ]);        
@@ -25,7 +27,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'fname' => 'required|string|max:255',
+            'mname' => 'nullable|string|max:255',
+            'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'client_id' => 'required|integer',
@@ -37,13 +41,15 @@ class UserController extends Controller
         }
 
         User::create([
-            'name' => $request->name,
+            'fname' => $request->fname,
+            'mname' => $request->mname,
+            'lname' => $request->lname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'client_id' => $request->client_id,
             'role_id' => $request->role_id,
         ]);
-
+        session()->flash('success', 'User created successfully!');
         return back();
     }
     
@@ -54,7 +60,9 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'fname' => 'required|string|max:255',
+            'mname' => 'nullable|string|max:255',
+            'lname' => 'required|string|max:255',
             'email' => [
                 'required',
                 'string',
@@ -64,26 +72,28 @@ class UserController extends Controller
             ],
         ]);
 
-
         $user->update($validated);
+        session()->flash('success', 'User updated successfully!');
         return back();
     }
 
-    public function show(User $user)
+    public function show(User $user, Request $request)
     {
         if ($user->client_id !== auth()->user()->client_id) {
             abort(403, 'Unauthorized');
         }
 
-        return Inertia::render('Users/user-details', [
-            'user' => $user
+        return Inertia::render('admin/admin-user-details', [
+            'user' => $user,
+            'from_meeting' => $request->query('from_meeting')
         ]);
     }
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index');
+        session()->flash('success', 'User deleted successfully!');
+        return redirect()->route('admin.users.index');
     }
     
     

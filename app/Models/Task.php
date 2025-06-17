@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Task extends Model
 {
@@ -14,20 +18,26 @@ class Task extends Model
         'status',
         'priority',
         'due_date',
+        'client_id'
     ];
 
-    public function users()
+    public function client(): BelongsTo
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(Client::class);
     }
 
-    public function meetings()
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany(Meeting::class);
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-    public function clients()
+    public function meetings(): BelongsToMany
     {
-        return $this->belongsToMany(Client::class);
+        return $this->belongsToMany(Meeting::class)->withTimestamps();
+    }
+
+    public function timelines(): MorphMany
+    {
+        return $this->morphMany(Timeline::class, 'subject');
     }
 }

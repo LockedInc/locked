@@ -25,8 +25,8 @@ class Client extends Model
         return $this->hasMany(User::class);
     }
 
-    public function tasks(): BelongsToMany
+    public function tasks(): HasMany
     {
-        return $this->belongsToMany(Task::class);
+        return $this->hasMany(Task::class);
     }
 }

@@ -20,6 +20,7 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    requiredRole?: UserRole;
 }
 
 export interface SharedData {
@@ -31,15 +32,24 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export type UserRole = 'Client-Admin' | 'Member';
+
+export interface Role {
+    name: UserRole;
+}
+
 export interface User {
     id: number;
-    name: string;
+    fname: string;
+    mname?: string;
+    lname: string;
     email: string;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    role?: Role;
+    [key: string]: unknown;
 }
 
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = {

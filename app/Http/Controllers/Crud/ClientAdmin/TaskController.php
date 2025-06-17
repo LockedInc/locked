@@ -1,0 +1,142 @@
+<?php
+
+namespace App\Http\Controllers\Crud\ClientAdmin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Task;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Services\TimelineMessageService;
+class TaskController extends Controller
+{
+    public function index()
+    {
+        $clientId = auth()->user()->client->id;
+
+        $tasks = Task::where('client_id', $clientId)
+            ->with(['users' => function ($query) use ($clientId) {
+                $query->where('users.client_id', $clientId)
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
+            }])
+            ->get();
+
+        $users = User::where('client_id', $clientId)
+            ->select('id', 'fname', 'mname', 'lname', 'email')
+            ->get();
+
+        return Inertia::render('admin/admin-task-list', [
+            'tasks' => $tasks,
+            'users' => $users
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'status' => 'required|in:pending,in_progress,completed',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+            'users' => 'array',
+            'users.*' => 'exists:users,id',
+            'meeting_id' => 'nullable|exists:meetings,id'
+        ]);
+
+        $task = Task::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'status' => $request->status,
+            'priority' => $request->priority,
+            'due_date' => $request->due_date,
+            'client_id' => auth()->user()->client->id
+        ]);
+        
+        if ($request->has('users')) {
+            $task->users()->sync($request->users);
+        }
+
+        if ($request->has('meeting_id')) {
+            $task->meetings()->sync([$request->meeting_id]);
+        }
+
+        $timelineMessageService = new TimelineMessageService();
+        $timelineMessageService->taskCreated(auth()->user(), $task->name, 'Task', $task->id);
+
+        session()->flash('success', 'Task created successfully!');
+        return back();
+    }   
+
+    public function show(Task $task, Request $request)
+    {
+        // Ensure the task belongs to the user's client
+        if ($task->client_id !== auth()->user()->client->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        $clientId = auth()->user()->client->id;
+
+        // Get all users for the client, for the task details page (to assign users to the task)
+        $all_users = User::where('client_id', $clientId)
+            ->select('id', 'fname', 'mname', 'lname', 'email')
+            ->get();
+
+        return Inertia::render('admin/admin-task-details', [
+            'task' => $task->load(['users' => function ($query) use ($clientId) {
+                $query->where('users.client_id', $clientId)
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
+            }]),
+            'all_users' => $all_users,
+            'from_meeting' => $request->query('from_meeting')
+        ]);
+    }
+
+    public function update(Request $request, Task $task)
+    {
+        // Ensure the task belongs to the user's client
+        if ($task->client_id !== auth()->user()->client->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
+            'status' => 'required|in:pending,in_progress,completed',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+            'users' => 'array',
+            'users.*' => 'exists:users,id'
+        ]);
+
+        $originalValues = $task->getOriginal();
+
+
+        $task->update($request->only(['name', 'description', 'status', 'priority', 'due_date']));
+
+        if ($request->has('users')) {
+            $task->users()->sync($request->users);
+        }
+
+        $timelineMessageService = new TimelineMessageService();
+        $timelineMessageService->taskUpdated(auth()->user(), $task->name, 'Task', $task->id , $originalValues, $validatedData);
+
+        session()->flash('success', 'Task updated successfully!');
+        return back();
+    }
+
+    public function destroy(Task $task)
+    {
+        // Ensure the task belongs to the user's client
+        if ($task->client_id !== auth()->user()->client->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        $task->delete();
+        session()->flash('success', 'Task deleted successfully!');
+        return redirect()->route('admin.tasks.index');
+    }
+    
+    
+       
+}

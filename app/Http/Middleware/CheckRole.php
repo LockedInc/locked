@@ -2,28 +2,30 @@
 
 namespace App\Http\Middleware;
 
+use App\Policies\RolePolicy;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole 
 {
+    protected $rolePolicy;
+
+    public function __construct(RolePolicy $rolePolicy)
+    {
+        $this->rolePolicy = $rolePolicy;
+    }
+
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
         $user = $request->user();
 
-        // If not logged in or no role, deny
-        if (!$user || !$user->role) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Check if user's role matches the required role
-        if ($user->role->name !== $role) {
+        if (!$user || !$this->rolePolicy->hasRole($user, $role)) {
             abort(403, 'Unauthorized');
         }
 
