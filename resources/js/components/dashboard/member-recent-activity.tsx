@@ -49,7 +49,7 @@ export function MemberRecentActivity({ activities }: RecentActivityProps) {
                         <div className="flex items-center gap-2 mt-1">
                             <User className="h-3 w-3 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground">
-                                {activity.user?.name}
+                                {activity.user?.fname} {activity.user?.lname}
                             </span>
                             <span className="text-xs text-muted-foreground">•</span>
                             <span className="text-xs text-muted-foreground">

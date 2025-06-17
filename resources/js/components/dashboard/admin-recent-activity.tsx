@@ -54,7 +54,7 @@ export function RecentActivity({ activities }: RecentActivityProps) {
                             </p>
                             {activity.user && (
                                 <span className="text-xs text-muted-foreground/60">
-                                    • by {activity.user.name}
+                                    • by {activity.user.fname} {activity.user.lname}
                                 </span>
                             )}
                         </div>

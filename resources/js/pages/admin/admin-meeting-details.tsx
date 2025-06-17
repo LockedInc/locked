@@ -245,7 +245,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                                     variant="secondary" 
                                                                     className="text-sm bg-muted/50"
                                                                 >
-                                                                    {user.name}
+                                                                    {user.fname} {user.lname}
                                                                 </Badge>
                                                             ))
                                                         }
@@ -283,7 +283,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                                                     data.users.includes(user.id) ? "opacity-100" : "opacity-0"
                                                                                 )}
                                                                             />
-                                                                            <span>{user.name}</span>
+                                                                            <span>{user.fname} {user.lname}</span>
                                                                         </CommandItem>
                                                                     ))}
                                                                 </CommandGroup>
@@ -302,7 +302,7 @@ export default function MeetingDetails({ meeting, users, tasks }: PageProps) {
                                                                     className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
                                                                     onClick={() => router.visit(`/users/${user.id}?from_meeting=${meeting.id}`)}
                                                                 >
-                                                                    {user.name}
+                                                                    {user.fname} {user.lname}
                                                                 </Badge>
                                                             ))
                                                         ) : (

@@ -10,6 +10,7 @@ export interface Timeline {
     deleted_at: string | null;
     user?: {
         id: number;
-        name: string;
+        fname: string;
+        lname: string;
     };
 } 

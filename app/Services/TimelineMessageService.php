@@ -9,7 +9,7 @@ class TimelineMessageService
 {
     public function taskCreated($user, string $message, string $subjectType, int $subjectId): void
     {   
-        $message = "Task created by " . $user->name;
+        $message = "Task created by " . $user->fname . " " . $user->lname;
         Log::info('through service');
         event(new TimelineMessage($user, $message, $subjectType, $subjectId));
     }
@@ -24,7 +24,7 @@ class TimelineMessageService
             }
         }
 
-        $message = "Task updated by " . $user->name;
+        $message = "Task updated by " . $user->fname . " " . $user->lname;
         if (!empty($changedFields)) {
             $fieldMessages = [];
             foreach ($changedFields as $field => $value) {

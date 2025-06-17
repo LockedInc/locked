@@ -13,7 +13,9 @@ import { useRolePrefix } from '@/hooks/use-role-prefix';
 
 interface UserData {
     id: number;
-    name: string;
+    fname: string;
+    mname?: string;
+    lname: string;
     email: string;
 }
 
@@ -26,7 +28,9 @@ export default function UserDetails({ user }: PageProps) {
     const [isEditing, setIsEditing] = useState(false);
     const { getRoute } = useRolePrefix();
     const { data, setData, put, processing, errors, reset } = useForm({
-        name: user.name,
+        fname: user.fname,
+        mname: user.mname || '',
+        lname: user.lname,
         email: user.email,
     });
     const { props } = usePage();
@@ -49,7 +53,7 @@ export default function UserDetails({ user }: PageProps) {
             }
         ]),
         {
-            title: user.name,
+            title: `${user.fname} ${user.lname}`,
             href: `/users/${user.id}`,
         },
     ];
@@ -70,7 +74,7 @@ export default function UserDetails({ user }: PageProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`User: ${data.name}`} />
+            <Head title={`User: ${user.fname} ${user.lname}`} />
             <div className="container mx-auto py-8">
                 <Card className="w-full max-w-2xl mx-auto bg-white dark:bg-neutral-800 shadow-lg">
                     <CardHeader className="border-b border-neutral-200 dark:border-neutral-700 pb-6">
@@ -79,7 +83,7 @@ export default function UserDetails({ user }: PageProps) {
                                 <div className="p-3 bg-primary/10 rounded-full">
                                     <User className="h-6 w-6 text-primary" />
                                 </div>
-                                <CardTitle className="text-2xl font-semibold">{data.name}</CardTitle>
+                                <CardTitle className="text-2xl font-semibold">{`${user.fname} ${user.lname}`}</CardTitle>
                             </div>
                             <div className="flex gap-2">
                                 {isEditing ? (
@@ -99,7 +103,7 @@ export default function UserDetails({ user }: PageProps) {
                                         <DeleteConfirmation
                                             onConfirm={() => router.delete(`/users/${user.id}`)}
                                             itemType="user"
-                                            itemName={user.name}
+                                            itemName={`${user.fname} ${user.lname}`}
                                         >
                                             <Button variant="destructive" className="cursor-pointer">
                                                 Delete User
@@ -113,17 +117,45 @@ export default function UserDetails({ user }: PageProps) {
                     <CardContent className="pt-6">
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="fname">First Name</Label>
                                 {isEditing ? (
                                     <Input
-                                        id="name"
-                                        value={data.name}
-                                        onChange={e => setData('name', e.target.value)}
-                                        error={errors.name}
+                                        id="fname"
+                                        value={data.fname}
+                                        onChange={e => setData('fname', e.target.value)}
+                                        error={errors.fname}
                                         className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
                                     />
                                 ) : (
-                                    <p className="text-lg">{data.name}</p>
+                                    <p className="text-lg">{data.fname}</p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="mname">Middle Name</Label>
+                                {isEditing ? (
+                                    <Input
+                                        id="mname"
+                                        value={data.mname}
+                                        onChange={e => setData('mname', e.target.value)}
+                                        error={errors.mname}
+                                        className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
+                                    />
+                                ) : (
+                                    <p className="text-lg">{data.mname || '-'}</p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="lname">Last Name</Label>
+                                {isEditing ? (
+                                    <Input
+                                        id="lname"
+                                        value={data.lname}
+                                        onChange={e => setData('lname', e.target.value)}
+                                        error={errors.lname}
+                                        className="h-10 text-sm bg-muted/30 p-4 rounded-md min-h-[40px] flex items-center text-foreground border w-full"
+                                    />
+                                ) : (
+                                    <p className="text-lg">{data.lname}</p>
                                 )}
                             </div>
                             <div className="space-y-2">

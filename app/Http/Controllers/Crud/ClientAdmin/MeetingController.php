@@ -19,7 +19,7 @@ class MeetingController extends Controller
         $meetings = Meeting::where('client_id', $clientId)
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }])
             ->with(['tasks' => function ($query) use ($clientId) {
                 $query->where('tasks.client_id', $clientId)
@@ -29,7 +29,7 @@ class MeetingController extends Controller
             ->get();
 
         $availableUsers = User::where('client_id', $clientId)
-            ->select('id', 'name', 'email')
+            ->select('id', 'fname', 'mname', 'lname', 'email')
             ->get();
 
         $availableTasks = Task::where('client_id', $clientId)
@@ -96,7 +96,7 @@ class MeetingController extends Controller
         // Load the meeting with its relationships and agenda
         $meeting->load(['users' => function ($query) use ($clientId) {
             $query->where('users.client_id', $clientId)
-                ->select('users.id', 'users.name', 'users.email');
+                ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
         }])
         ->load(['tasks' => function ($query) use ($clientId) {
             $query->where('tasks.client_id', $clientId)
@@ -109,7 +109,7 @@ class MeetingController extends Controller
 
         // Get all available users and tasks for the form
         $availableUsers = User::where('client_id', $clientId)
-            ->select('id', 'name', 'email')
+            ->select('id', 'fname', 'mname', 'lname', 'email')
             ->get();
 
         $availableTasks = Task::where('client_id', $clientId)

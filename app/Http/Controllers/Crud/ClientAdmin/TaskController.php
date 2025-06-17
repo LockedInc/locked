@@ -17,12 +17,12 @@ class TaskController extends Controller
         $tasks = Task::where('client_id', $clientId)
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }])
             ->get();
 
         $users = User::where('client_id', $clientId)
-            ->select('id', 'name', 'email')
+            ->select('id', 'fname', 'mname', 'lname', 'email')
             ->get();
 
         return Inertia::render('admin/admin-task-list', [
@@ -79,13 +79,13 @@ class TaskController extends Controller
 
         // Get all users for the client, for the task details page (to assign users to the task)
         $all_users = User::where('client_id', $clientId)
-            ->select('id', 'name', 'email')
+            ->select('id', 'fname', 'mname', 'lname', 'email')
             ->get();
 
         return Inertia::render('admin/admin-task-details', [
             'task' => $task->load(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }]),
             'all_users' => $all_users,
             'from_meeting' => $request->query('from_meeting')

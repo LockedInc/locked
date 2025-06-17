@@ -27,7 +27,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'fname' => 'required|string|max:255',
+            'mname' => 'nullable|string|max:255',
+            'lname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'client_id' => 'required|integer',
@@ -39,7 +41,9 @@ class UserController extends Controller
         }
 
         User::create([
-            'name' => $request->name,
+            'fname' => $request->fname,
+            'mname' => $request->mname,
+            'lname' => $request->lname,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'client_id' => $request->client_id,
@@ -56,7 +60,9 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'fname' => 'required|string|max:255',
+            'mname' => 'nullable|string|max:255',
+            'lname' => 'required|string|max:255',
             'email' => [
                 'required',
                 'string',
@@ -65,7 +71,6 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
         ]);
-
 
         $user->update($validated);
         session()->flash('success', 'User updated successfully!');

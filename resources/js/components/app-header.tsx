@@ -86,8 +86,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                                     <Avatar className="h-8 w-8">
-                                        <AvatarImage src={page.props.auth.user.avatar || ''} alt={page.props.auth.user.name || ''} />
-                                        <AvatarFallback>{getInitials(page.props.auth.user.name || '')}</AvatarFallback>
+                                        <AvatarImage src={page.props.auth.user.avatar || ''} alt={page.props.auth.user.fname || '' + ' ' + page.props.auth.user.lname || ''} />
+                                        <AvatarFallback>{getInitials(page.props.auth.user.fname || '' + ' ' + page.props.auth.user.lname || '')}</AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>

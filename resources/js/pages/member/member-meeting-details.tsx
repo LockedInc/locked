@@ -118,7 +118,7 @@ export default function MemberMeetingDetails({ meeting, users, tasks }: MemberMe
                                                         variant="secondary" 
                                                         className="text-sm bg-muted/50"
                                                     >
-                                                        {user.name}
+                                                        {user.fname} {user.lname}
                                                     </Badge>
                                                 ))}
                                             </div>

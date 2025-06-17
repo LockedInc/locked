@@ -162,7 +162,7 @@ export default function TaskDetails({ task }: PageProps) {
                                                             variant="secondary" 
                                                             className="text-sm bg-muted/50"
                                                         >
-                                                            {user.name}
+                                                            {user.fname} {user.lname}
                                                         </Badge>
                                                     ))
                                                 ) : (

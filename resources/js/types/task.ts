@@ -3,7 +3,8 @@ export type TaskPriority = 'low' | 'medium' | 'high';
 
 export interface User {
     id: number;
-    name: string;
+    fname: string;
+    lname: string;
     email: string;
 }
 

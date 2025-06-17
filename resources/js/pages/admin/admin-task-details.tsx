@@ -186,7 +186,10 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                         <div className="space-y-2 w-full">
                                             {isEditing ? (
                                                 <MultiSelect
-                                                    items={all_users}
+                                                    items={all_users.map(user => ({
+                                                        id: user.id,
+                                                        name: `${user.fname} ${user.lname}`
+                                                    }))}
                                                     selectedIds={data.users}
                                                     onSelectionChange={(ids) => setData('users', ids)}
                                                     placeholder="Select users..."
@@ -204,7 +207,7 @@ export default function TaskDetails({ task, all_users }: PageProps) {
                                                                     className="text-sm bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
                                                                     onClick={() => router.visit(`/users/${user.id}?from_task=${task.id}`)}
                                                                 >
-                                                                    {user.name}
+                                                                    {user.fname} {user.lname}
                                                                 </Badge>
                                                             ))
                                                         ) : (

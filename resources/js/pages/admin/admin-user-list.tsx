@@ -49,7 +49,7 @@ const columns: ColumnDef<User>[] = [
             const user = row.original;
             return (
                 <div>
-                    <div className="font-medium">{user.name}</div>
+                    <div className="font-medium">{user.fname} {user.lname}</div>
                 </div>
             )
         },

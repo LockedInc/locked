@@ -145,7 +145,7 @@ const columns: ColumnDef<Meeting>[] = [
                 <div className="flex flex-wrap gap-1">
                     {attendees.map((user) => (
                         <Badge key={user.id} variant="secondary">
-                            {user.name}
+                            {user.fname} {user.lname}
                         </Badge>
                     ))}
                 </div>

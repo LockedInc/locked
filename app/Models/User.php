@@ -23,7 +23,9 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'fname',
+        'mname',
+        'lname',
         'email',
         'password',
         'client_id',
@@ -51,6 +53,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user's full name.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return trim(implode(' ', array_filter([$this->fname, $this->mname, $this->lname])));
     }
 
     public function meetings(): BelongsToMany

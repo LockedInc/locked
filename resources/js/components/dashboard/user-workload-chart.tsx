@@ -15,7 +15,7 @@ export function UserWorkloadChart({ tasks, users }: UserWorkloadChartProps) {
         );
         
         return {
-            name: user.name,
+            name: user.fname + ' ' + user.lname,
             total: userTasks.length,
         };
     });

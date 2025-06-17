@@ -25,7 +25,7 @@ class MemberDashboardController extends Controller
             })
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }])
             ->get();
 
@@ -53,13 +53,13 @@ class MemberDashboardController extends Controller
             })
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }])
             ->get();
 
         // Get user's recent timeline activities
         $recentActivities = Timeline::where('user_id', $userId)
-            ->with(['user:id,name'])
+            ->with(['user:id,fname,mname,lname'])
             ->latest()
             ->take(10)
             ->get();

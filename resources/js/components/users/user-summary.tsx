@@ -3,7 +3,9 @@ import { Users, UserCheck, UserX } from 'lucide-react';
 
 interface User {
     id: number;
-    name: string;
+    fname: string;
+    mname?: string;
+    lname: string;
     email: string;
     role: {
         id: number;

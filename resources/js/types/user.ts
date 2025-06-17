@@ -1,10 +1,13 @@
 export interface User {
     id: number;
-    name: string;
+    fname: string;
+    mname?: string;
+    lname: string;
     email: string;
     role?: {
         id: number;
         name: string;
     };
     client_id?: number;
+    full_name?: string;
 } 

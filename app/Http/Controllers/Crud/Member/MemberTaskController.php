@@ -20,7 +20,7 @@ class MemberTaskController extends Controller
         $query = Task::where('client_id', $clientId)
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }]);
 
         // If view is 'assigned', only show tasks assigned to the user
@@ -33,7 +33,7 @@ class MemberTaskController extends Controller
         $tasks = $query->get();
 
         $users = User::where('client_id', $clientId)
-            ->select('id', 'name', 'email')
+            ->select('id', 'fname', 'mname', 'lname', 'email')
             ->get();
 
         return Inertia::render('member/member-task-list', [
@@ -90,7 +90,7 @@ class MemberTaskController extends Controller
         return Inertia::render('member/member-task-details', [
             'task' => $task->load(['users' => function ($query) {
                 $query->where('users.client_id', auth()->user()->client->id)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }])
         ]);
     }

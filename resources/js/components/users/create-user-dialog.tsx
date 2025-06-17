@@ -34,7 +34,9 @@ export default function CreateUserDialog({ open, onOpenChange }: CreateUserDialo
     const clientId = auth.user.client_id;
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        fname: '',
+        mname: '',
+        lname: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -70,15 +72,39 @@ export default function CreateUserDialog({ open, onOpenChange }: CreateUserDialo
                         <CardContent className="pt-6">
                             <div className="grid gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="fname">First Name</Label>
                                     <Input
-                                        id="name"
-                                        value={data.name}
-                                        onChange={e => setData('name', e.target.value)}
-                                        placeholder="Full name"
+                                        id="fname"
+                                        value={data.fname}
+                                        onChange={e => setData('fname', e.target.value)}
+                                        placeholder="First name"
                                         className="w-full"
                                     />
-                                    <InputError message={errors.name} />
+                                    <InputError message={errors.fname} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="mname">Middle Name</Label>
+                                    <Input
+                                        id="mname"
+                                        value={data.mname}
+                                        onChange={e => setData('mname', e.target.value)}
+                                        placeholder="Middle name (optional)"
+                                        className="w-full"
+                                    />
+                                    <InputError message={errors.mname} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="lname">Last Name</Label>
+                                    <Input
+                                        id="lname"
+                                        value={data.lname}
+                                        onChange={e => setData('lname', e.target.value)}
+                                        placeholder="Last name"
+                                        className="w-full"
+                                    />
+                                    <InputError message={errors.lname} />
                                 </div>
 
                                 <div className="grid gap-2">

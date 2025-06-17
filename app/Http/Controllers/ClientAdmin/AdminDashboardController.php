@@ -23,7 +23,7 @@ class AdminDashboardController extends Controller
         $tasks = Task::where('client_id', $clientId)
             ->with(['users' => function ($query) use ($clientId) {
                 $query->where('users.client_id', $clientId)
-                    ->select('users.id', 'users.name', 'users.email');
+                    ->select('users.id', 'users.fname', 'users.mname', 'users.lname', 'users.email');
             }])
             ->get();
 
@@ -46,12 +46,12 @@ class AdminDashboardController extends Controller
 
         // Get all users for the timeline
         $users = User::where('client_id', $clientId)
-            ->select('id', 'name', 'email')
+            ->select('id', 'fname', 'mname', 'lname', 'email')
             ->get();
 
         // Get recent timeline activities
         $recentActivities = Timeline::where('origin_client_id', $clientId)
-            ->with(['user:id,name'])
+            ->with(['user:id,fname,mname,lname,email'])
             ->latest()
             ->take(10)
             ->get();

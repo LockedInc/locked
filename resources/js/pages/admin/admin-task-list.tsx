@@ -139,7 +139,7 @@ const columns: ColumnDef<Task>[] = [
                 <div className="flex flex-wrap gap-1">
                     {assignedUsers.map((user) => (
                         <Badge key={user.id} variant="secondary">
-                            {user.name}
+                            {user.fname} {user.lname}
                         </Badge>
                     ))}
                 </div>
@@ -341,7 +341,7 @@ export default function AdminTaskList({ tasks, users }: AdminTaskListProps) {
                                                             <SelectItem value="all">All Users</SelectItem>
                                                             {users.map((user) => (
                                                                 <SelectItem key={user.id} value={String(user.id)}>
-                                                                    {user.name}
+                                                                    {user.fname} {user.lname}
                                                                 </SelectItem>
                                                             ))}
                                                         </SelectContent>

@@ -220,7 +220,7 @@ const columns: ColumnDef<Task>[] = [
                 <div className="flex flex-wrap gap-1">
                     {assignedUsers.map((user) => (
                         <Badge key={user.id} variant="secondary">
-                            {user.name}
+                            {user.fname} {user.lname}
                         </Badge>
                     ))}
                 </div>

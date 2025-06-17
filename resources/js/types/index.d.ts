@@ -40,7 +40,9 @@ export interface Role {
 
 export interface User {
     id: number;
-    name: string;
+    fname: string;
+    mname?: string;
+    lname: string;
     email: string;
     avatar?: string;
     email_verified_at: string | null;
