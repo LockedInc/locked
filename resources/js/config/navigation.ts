@@ -1,5 +1,5 @@
 import { type NavItem } from '@/types';
-import { LayoutGrid, SquareCheckBig, Users, Calendar } from 'lucide-react';
+import { LayoutGrid, SquareCheckBig, Users, Calendar, Bell } from 'lucide-react';
 
 export const navigationConfig = {
     admin: [

@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             TaskSeeder::class,
             AgendaSeeder::class,
             MeetingSeeder::class,
+            AlertSeeder::class,
         ]);
     }
 }

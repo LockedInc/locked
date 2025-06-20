@@ -59,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Redirect root dashboard to role-specific dashboard
     Route::get('/dashboard', function () {
-        return redirect()->route(auth()->user()->role->name === 'Client-Admin' ? 'admin.dashboard' : 'member.dashboard');
+        return redirect()->route(request()->user()->role->name === 'Client-Admin' ? 'admin.dashboard' : 'member.dashboard');
     })->name('dashboard');
 });
 

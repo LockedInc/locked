@@ -10,10 +10,11 @@ use App\Models\Meeting;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Models\Timeline;
+use App\Services\AlertsService;
 
 class MemberDashboardController extends Controller
 {
-    public function index()
+    public function index(AlertsService $alertsService)
     {
         $userId = auth()->id();
         $clientId = auth()->user()->client->id;
@@ -64,12 +65,16 @@ class MemberDashboardController extends Controller
             ->take(10)
             ->get();
 
+        $alerts = $alertsService->getUserAlerts($userId);
+        // limit the alerts to 5
+
         return Inertia::render('member/member-dashboard', [
             'taskStats' => $taskStats,
             'upcomingTasks' => $upcomingTasks,
             'meetings' => $meetings,
             'tasks' => $tasks,
             'recentActivities' => $recentActivities,
+            'alerts' => $alerts,
         ]);
     }
 } 

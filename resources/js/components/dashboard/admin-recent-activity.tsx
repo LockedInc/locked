@@ -27,8 +27,12 @@ export function RecentActivity({ activities }: RecentActivityProps) {
 
     if (activities.length === 0) {
         return (
-            <div className="text-muted-foreground text-sm">
-                No recent activity
+            <div className="flex flex-col items-center justify-center h-full text-center p-6">
+                <Clock className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground mb-2">No Recent Activity</h3>
+                <p className="text-sm text-muted-foreground">
+                    Your recent activity will appear here as you work on tasks and attend meetings.
+                </p>
             </div>
         );
     }
