@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { useEffect } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,19 +40,39 @@ interface DashboardProps {
 }
 
 export default function MemberDashboard({ taskStats, recentActivities, tasks, alerts }: DashboardProps) {
+    // Auto-refresh dashboard data every 30 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({ only: ['alerts', 'taskStats', 'recentActivities'] });
+        }, 30 * 1000); // 30 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
     const handleMarkAsRead = (alertId: number) => {
-        // TODO: Implement mark as read functionality
-        console.log('Mark as read:', alertId);
+        router.post(`/member/alerts/${alertId}/mark-read`, {}, {
+            onSuccess: () => {
+                console.log('Alert marked as read successfully');
+            },
+            onError: (errors) => {
+                console.error('Error marking alert as read:', errors);
+            },
+        });
     };
 
     const handleMarkAsUnread = (alertId: number) => {
-        // TODO: Implement mark as unread functionality
-        console.log('Mark as unread:', alertId);
+        router.post(`/member/alerts/${alertId}/mark-unread`, {}, {
+            onSuccess: () => {
+                console.log('Alert marked as unread successfully');
+            },
+            onError: (errors) => {
+                console.error('Error marking alert as unread:', errors);
+            },
+        });
     };
 
     const handleViewTask = (taskId: number) => {
-        // TODO: Navigate to task details
-        console.log('View task:', taskId);
+        router.visit(`/member/tasks/${taskId}`);
     };
 
     return (

@@ -77,4 +77,28 @@ class MemberDashboardController extends Controller
             'alerts' => $alerts,
         ]);
     }
+
+    public function markAlertAsRead($alertId, AlertsService $alertsService)
+    {
+        $userId = auth()->id();
+        $alert = $alertsService->markAlertAsRead($alertId, $userId);
+        
+        if ($alert) {
+            return redirect()->back()->with('success', 'Alert marked as read');
+        }
+        
+        return redirect()->back()->with('error', 'Alert not found or access denied');
+    }
+
+    public function markAlertAsUnread($alertId, AlertsService $alertsService)
+    {
+        $userId = auth()->id();
+        $alert = $alertsService->markAlertAsUnread($alertId, $userId);
+        
+        if ($alert) {
+            return redirect()->back()->with('success', 'Alert marked as unread');
+        }
+        
+        return redirect()->back()->with('error', 'Alert not found or access denied');
+    }
 } 

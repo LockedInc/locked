@@ -4,13 +4,14 @@ import { type BreadcrumbItem, type PageProps } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, ArrowUpDown, Filter, Calendar, User } from 'lucide-react';
+import { Plus, ArrowUpDown, Filter, Calendar, User, Bell } from 'lucide-react';
 import { DataTable } from '@/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, addDays, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
 import { type Task, type User as TaskUser, type TaskStatus } from '@/types/task';
 import { CreateTaskDialog } from '@/components/tasks/create-task-dialog';
+import { SendAlertDialog } from '@/components/tasks/send-alert-dialog';
 import { AdminTaskStats } from '@/components/tasks/admin-task-stats';
 import {
     DropdownMenu,
@@ -29,6 +30,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useRolePrefix } from '@/hooks/use-role-prefix';
+import React from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -146,6 +148,34 @@ const columns: ColumnDef<Task>[] = [
             )
         },
     },
+    {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+            const task = row.original;
+            return (
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 group relative"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            // This will be handled by the parent component
+                            window.dispatchEvent(new CustomEvent('openAlertDialog', { detail: task }));
+                        }}
+                        title="Send Alert"
+                    >
+                        <Bell className="h-4 w-4 text-blue-600 transition-all duration-200 group-hover:text-blue-700 group-hover:scale-110 group-hover:animate-pulse" />
+                        {/* Hover tooltip effect */}
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                            Send Alert
+                        </div>
+                    </Button>
+                </div>
+            )
+        },
+    },
 ];
 
 export default function AdminTaskList({ tasks, users }: AdminTaskListProps) {
@@ -154,9 +184,24 @@ export default function AdminTaskList({ tasks, users }: AdminTaskListProps) {
     const { getRoute } = useRolePrefix();
     const prefix = isAdmin ? '/admin' : '/member';
     const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+    const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [filteredTasks, setFilteredTasks] = useState(tasks);
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
     const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null);
+
+    // Listen for alert dialog open events
+    useEffect(() => {
+        const handleOpenAlertDialog = (event: CustomEvent) => {
+            setSelectedTask(event.detail);
+            setIsAlertDialogOpen(true);
+        };
+
+        window.addEventListener('openAlertDialog', handleOpenAlertDialog as EventListener);
+        return () => {
+            window.removeEventListener('openAlertDialog', handleOpenAlertDialog as EventListener);
+        };
+    }, []);
 
     const clearFilters = () => {
         setSelectedUser(null);
@@ -364,6 +409,12 @@ export default function AdminTaskList({ tasks, users }: AdminTaskListProps) {
                     users={users}
                     open={isTaskDialogOpen}
                     onOpenChange={setIsTaskDialogOpen}
+                />
+
+                <SendAlertDialog
+                    open={isAlertDialogOpen}
+                    onOpenChange={setIsAlertDialogOpen}
+                    task={selectedTask}
                 />
             </div>
         </AppLayout>

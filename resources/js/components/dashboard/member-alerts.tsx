@@ -30,13 +30,19 @@ const getAlertIcon = (priority: string, isRead: boolean) => {
         isRead ? "text-muted-foreground" : "text-foreground"
     );
 
+    // For unread alerts, show red circle with exclamation mark
+    if (!isRead) {
+        return <AlertCircle className={cn(iconClass, "text-destructive")} />;
+    }
+
+    // For read alerts, show different icons based on priority
     switch (priority) {
         case 'high':
-            return <AlertCircle className={cn(iconClass, "text-destructive")} />;
+            return <AlertCircle className={cn(iconClass, "text-muted-foreground")} />;
         case 'medium':
-            return <AlertCircle className={cn(iconClass, "text-warning")} />;
+            return <AlertCircle className={cn(iconClass, "text-muted-foreground")} />;
         case 'low':
-            return <Info className={cn(iconClass, "text-blue-500")} />;
+            return <Info className={cn(iconClass, "text-muted-foreground")} />;
         default:
             return <MessageSquare className={iconClass} />;
     }
@@ -183,9 +189,7 @@ export function MemberAlerts({ alerts, onMarkAsRead, onMarkAsUnread, onViewTask 
                                         "border-l-4 border-l-blue-500",
                                         "bg-gradient-to-r from-blue-50/80 to-white dark:from-blue-950/30 dark:to-background",
                                         "shadow-sm hover:shadow-md",
-                                        "ring-1 ring-blue-200/50 dark:ring-blue-800/50",
-                                        // Pulsing animation for very recent alerts
-                                        isRecent && "animate-pulse"
+                                        "ring-1 ring-blue-200/50 dark:ring-blue-800/50"
                                     ],
                                     // Read alert styling - muted
                                     alert.is_read && [
@@ -194,18 +198,17 @@ export function MemberAlerts({ alerts, onMarkAsRead, onMarkAsUnread, onViewTask 
                                         "border-gray-200 dark:border-gray-700"
                                     ]
                                 )}
-                                onClick={() => alert.task_id && onViewTask?.(alert.task_id)}
+                                onClick={() => {
+                                    // Mark as read if unread
+                                    if (!alert.is_read) {
+                                        onMarkAsRead?.(alert.id);
+                                    }
+                                    // Navigate to task if available
+                                    if (alert.task_id) {
+                                        onViewTask?.(alert.task_id);
+                                    }
+                                }}
                             >
-                                {/* NEW badge for very recent alerts */}
-                                {isRecent && (
-                                    <div className="absolute -top-1 -right-1 z-10">
-                                        <Badge className="bg-red-500 text-white text-xs px-1.5 py-0.5 animate-bounce">
-                                            <Sparkles className="h-2.5 w-2.5 mr-0.5" />
-                                            NEW
-                                        </Badge>
-                                    </div>
-                                )}
-                                
                                 <div className="flex items-center gap-2">
                                     {getAlertIcon(alert.task?.priority || 'medium', alert.is_read)}
                                     

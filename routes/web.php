@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Crud\ClientAdmin\UserController as ClientAdminUserController;
 use App\Http\Controllers\Crud\ClientAdmin\TaskController as ClientAdminTaskController;
 use App\Http\Controllers\Crud\ClientAdmin\MeetingController as ClientAdminMeetingController;
+use App\Http\Controllers\ClientAdmin\AdminAlertController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\ClientAdmin\AdminDashboardController;
 use App\Http\Controllers\Crud\Member\MemberTaskController;
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('meetings/{meeting}', [ClientAdminMeetingController::class, 'show'])->name('meetings.show');
         Route::put('meetings/{meeting}', [ClientAdminMeetingController::class, 'update'])->name('meetings.update');
         Route::delete('meetings/{meeting}', [ClientAdminMeetingController::class, 'destroy'])->name('meetings.destroy');
+
+        // Admin Alert Routes
+        Route::post('alerts/send', [AdminAlertController::class, 'sendAlert'])->name('alerts.send');
     });
 
     // Member Routes
@@ -55,6 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Member Meeting Routes
         Route::get('meetings', [MemberMeetingController::class, 'index'])->name('meetings.index');
         Route::get('meetings/{meeting}', [MemberMeetingController::class, 'show'])->name('meetings.show');
+
+        // Member Alert Routes
+        Route::post('alerts/{alert}/mark-read', [MemberDashboardController::class, 'markAlertAsRead'])->name('alerts.mark-read');
+        Route::post('alerts/{alert}/mark-unread', [MemberDashboardController::class, 'markAlertAsUnread'])->name('alerts.mark-unread');
     });
 
     // Redirect root dashboard to role-specific dashboard

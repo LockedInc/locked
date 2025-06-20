@@ -22,6 +22,15 @@ class Task extends Model
         'client_id'
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'due_date' => 'datetime',
+    ];
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);

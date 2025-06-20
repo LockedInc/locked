@@ -4,7 +4,9 @@ namespace App\Services;
 use App\Models\Alert;
 use App\Models\Task;
 use App\Models\User;
+use App\Mail\AlertNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AlertsService
 {   
@@ -128,24 +130,50 @@ class AlertsService
     }
 
     // create an alert by an admin
-    public function createAlert($adminUserId, $message, $taskId, $userIds)
+    public function createAlert($adminUserId, $message, $taskId, $userIds = null)
     {
+        // Get the admin user
+        $admin = User::find($adminUserId);
+        if (!$admin) {
+            throw new \Exception('Admin user not found');
+        }
+
+        // Get the task with its relationships
+        $task = Task::with(['users', 'client'])->find($taskId);
+        if (!$task) {
+            throw new \Exception('Task not found');
+        }
+
+        // Create a single alert associated with the task
         $alert = Alert::create([
             'admin_id' => $adminUserId,
             'message' => $message,
-            'task_id' => $taskId
+            'task_id' => $taskId,
+            'user_id' => null // This alert is for all users assigned to the task
         ]);
 
-        // If userIds is provided, create user-specific alerts
-        if (!empty($userIds)) {
-            foreach ($userIds as $userId) {
-                // You might want to create individual alert records for each user
-                // or use a pivot table depending on your alert structure
-                Alert::create([
-                    'admin_id' => $adminUserId,
-                    'message' => $message,
-                    'task_id' => $taskId,
-                    'user_id' => $userId
+        // Load the task relationship for the alert
+        $alert->load('task');
+
+        // Send emails to all users assigned to the task
+        if ($userIds && is_array($userIds)) {
+            $users = User::whereIn('id', $userIds)->get();
+        } else {
+            // If no specific user IDs provided, get all users assigned to the task
+            $users = $task->users;
+        }
+
+        // Send email to each user
+        foreach ($users as $user) {
+            try {
+                Mail::to($user->email)->send(new AlertNotification($alert, $user, $admin));
+            } catch (\Exception $e) {
+                // Log the email sending error but don't fail the entire operation
+                \Illuminate\Support\Facades\Log::error('Failed to send alert email', [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email,
+                    'alert_id' => $alert->id,
+                    'error' => $e->getMessage()
                 ]);
             }
         }
